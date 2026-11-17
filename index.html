@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="店頭でオフィスチェアを試座し、座り心地・機能・価格を記録して比較できるWebアプリ">
+<meta name="theme-color" content="#0e151c">
+<title>チェア試座ノート｜試座記録と比較</title>
+<style>
+:root{
+  --bg:#0e151c; --bg2:#121d27; --card:#182635; --card2:#1e3042; --line:#2a3f55;
+  --text:#eef4f8; --muted:#a9bccb; --muted2:#7f95a8;
+  --accent:#35c9b8; --accent-d:#0f766e; --accent-soft:rgba(53,201,184,.14);
+  --amber:#f5b84c; --amber-soft:rgba(245,184,76,.14);
+  --rose:#fb7185; --rose-soft:rgba(251,113,133,.13);
+  --green:#4ade80; --green-soft:rgba(74,222,128,.13);
+  --blue:#60a5fa;
+  --radius:16px; --radius-s:10px;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --font:"Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:linear-gradient(180deg,#0b1219 0%,var(--bg) 220px);color:var(--text);font-family:var(--font);line-height:1.6;-webkit-text-size-adjust:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px 64px}
+
+/* Header */
+header{padding:28px 0 8px}
+.brand{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.logo{width:52px;height:52px;flex:0 0 52px;border-radius:14px;background:linear-gradient(135deg,var(--accent-d),var(--accent));display:grid;place-items:center;font-size:26px;box-shadow:var(--shadow)}
+h1{font-size:clamp(24px,5vw,34px);margin:0;line-height:1.25;letter-spacing:.02em}
+.tagline{color:var(--muted);margin:4px 0 0;font-size:14px}
+.profile-chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.chip{font-size:12.5px;color:var(--muted);border:1px solid var(--line);background:var(--bg2);border-radius:999px;padding:4px 11px}
+.chip b{color:var(--text);font-weight:600}
+.notice{margin-top:16px;background:var(--amber-soft);border:1px solid rgba(245,184,76,.45);color:#fde9bd;border-radius:var(--radius-s);padding:10px 14px;font-size:13.5px}
+.notice b{color:var(--amber)}
+
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0 4px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px}
+.stat .num{font-size:26px;font-weight:800;line-height:1.2}
+.stat .num small{font-size:14px;color:var(--muted);font-weight:600}
+.stat .lbl{font-size:12.5px;color:var(--muted);margin-top:2px}
+@media(max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+/* Toolbar */
+.toolbar{position:sticky;top:0;z-index:30;background:rgba(14,21,28,.92);backdrop-filter:blur(8px);padding:14px 0 10px;margin-top:8px}
+.toolbar-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.toolbar input[type="search"],.toolbar select{background:var(--card);border:1px solid var(--line);border-radius:var(--radius-s);padding:11px 12px;min-height:48px}
+.toolbar input[type="search"]{flex:1 1 180px;min-width:150px}
+.btn{border:1px solid var(--line);background:var(--card2);border-radius:var(--radius-s);padding:11px 16px;min-height:48px;font-weight:700;font-size:15px;display:inline-flex;align-items:center;gap:7px;justify-content:center;transition:transform .05s,background .15s}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--accent-d);border-color:var(--accent-d);color:#fff}
+.btn-primary:hover{background:#0d9488}
+.btn-ghost{background:transparent}
+.btn-danger{background:transparent;border-color:rgba(251,113,133,.5);color:#fda4af}
+.btn-small{min-height:42px;padding:8px 12px;font-size:13.5px;border-radius:9px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.checkline{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--muted);min-height:48px;padding:0 4px}
+.checkline input{width:20px;height:20px;accent-color:var(--accent-d)}
+
+/* Sections / cards */
+section{margin-top:26px}
+.sec-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.sec-head h2{font-size:20px;margin:0}
+.sec-head .sub{color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:0 4px 14px rgba(0,0,0,.22)}
+.card.top-pick{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
+.card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.card h3{margin:0;font-size:18px;line-height:1.4;overflow-wrap:anywhere}
+.maker{color:var(--muted);font-size:13px}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.badge{font-size:12px;font-weight:700;border-radius:999px;padding:3px 10px;border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.badge-candidate{background:var(--green-soft);color:#86efac;border-color:rgba(74,222,128,.4)}
+.badge-hold{background:var(--amber-soft);color:#fcd34d;border-color:rgba(245,184,76,.4)}
+.badge-exclude{background:var(--rose-soft);color:#fda4af;border-color:rgba(251,113,133,.4)}
+.badge-budget{background:var(--accent-soft);color:#5eead4;border-color:rgba(53,201,184,.4)}
+.badge-over{color:#fda4af}
+.badge-rank{background:var(--accent-d);color:#fff;border-color:var(--accent-d)}
+.scorebox{display:flex;gap:16px;align-items:center;margin:14px 0 6px;flex-wrap:wrap}
+.score-big{font-size:40px;font-weight:800;line-height:1;color:#fff}
+.score-big small{font-size:16px;color:var(--muted)}
+.score-meta{font-size:13px;color:var(--muted)}
+.score-meta b{color:var(--text)}
+.bar{height:10px;background:#0b1219;border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-d),var(--accent));border-radius:99px;transition:width .3s}
+.bar.comfort>i{background:linear-gradient(90deg,#b45309,var(--amber))}
+.mini-ratings{display:grid;grid-template-columns:1fr 1fr;gap:5px 16px;margin-top:12px}
+@media(max-width:480px){.mini-ratings{grid-template-columns:1fr}}
+.mini{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.mini .mlabel{flex:0 0 118px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mini .bar{flex:1;height:7px}
+.mini .mval{flex:0 0 26px;text-align:right;color:var(--text);font-weight:700}
+.meta-line{font-size:13.5px;color:var(--muted);margin-top:10px;overflow-wrap:anywhere}
+.meta-line b{color:var(--text);font-weight:600}
+.goodbad{margin-top:10px;font-size:14px;display:grid;gap:6px}
+.goodbad p{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.goodbad .g::before{content:"◎ ";color:var(--green);font-weight:800}
+.goodbad .b::before{content:"△ ";color:var(--amber);font-weight:800}
+.card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;border-top:1px solid var(--line);padding-top:14px;align-items:center}
+.compare-check{margin-left:auto}
+.empty{background:var(--card);border:1.5px dashed var(--line);border-radius:var(--radius);padding:36px 20px;text-align:center;color:var(--muted)}
+.empty .big{font-size:34px;margin-bottom:6px}
+.empty p{margin:6px 0}
+
+/* Form */
+.form-card{background:var(--card);border:1px solid var(--accent-d);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:640px){.form-grid{grid-template-columns:1fr}}
+.field{display:flex;flex-direction:column;gap:6px}
+.field.full{grid-column:1/-1}
+.field label{font-size:13.5px;font-weight:700;color:var(--muted)}
+.field label .req{color:var(--rose)}
+.field input,.field select,.field textarea{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-s);padding:12px;min-height:48px;font-size:16px;width:100%}
+.field textarea{min-height:76px;resize:vertical}
+.field .hint{font-size:12px;color:var(--muted2)}
+.store-chips{display:flex;gap:6px;flex-wrap:wrap}
+.store-chips button{background:var(--bg2);border:1px solid var(--line);border-radius:999px;padding:7px 12px;font-size:13px;min-height:38px}
+.rating-block{margin-top:18px;border-top:1px solid var(--line);padding-top:16px}
+.rating-row{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:12px 0;border-bottom:1px solid rgba(42,63,85,.55)}
+.rating-row:last-child{border-bottom:none}
+.rating-info .rname{font-weight:700;font-size:15px}
+.rating-info .rname .w{color:var(--accent);font-size:12.5px;margin-left:6px}
+.rating-info .rhint{font-size:12.5px;color:var(--muted2)}
+.rating-current{font-size:13px;color:var(--amber);font-weight:700;text-align:right;min-width:86px;padding-top:3px}
+.rate-btns{grid-column:1/-1;display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.rate-btns button{min-height:52px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);font-weight:800;font-size:17px;padding:4px 2px}
+.rate-btns button small{display:block;font-size:10.5px;font-weight:600;color:var(--muted2)}
+.rate-btns button.sel{background:var(--accent-d);border-color:var(--accent);color:#fff}
+.rate-btns button.sel small{color:#ccfbf1}
+.rate-btns button.sel-none{background:#334155;border-color:#64748b;color:#fff}
+.live-score{display:flex;gap:18px;flex-wrap:wrap;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-s);padding:14px 16px;margin-top:16px;align-items:center}
+.live-score .ls-num{font-size:30px;font-weight:800;line-height:1.1}
+.live-score .ls-lbl{font-size:12.5px;color:var(--muted)}
+.form-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;position:sticky;bottom:10px;background:var(--card);padding:10px 0 2px}
+.form-actions .btn{flex:1 1 140px}
+.error-msg{display:none;background:var(--rose-soft);border:1px solid rgba(251,113,133,.5);color:#fecdd3;border-radius:var(--radius-s);padding:10px 14px;font-size:14px;margin-top:12px}
+.error-msg.show{display:block}
+
+/* Compare */
+.compare-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);background:var(--card)}
+table.compare{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+table.compare th,table.compare td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;overflow-wrap:anywhere}
+table.compare th{background:var(--card2)}
+table.compare td.win{background:var(--accent-soft);font-weight:700}
+table.compare .rowlabel{color:var(--muted);font-size:13px;white-space:nowrap;background:var(--bg2)}
+.cmp-bars{display:grid;gap:14px;margin-top:16px}
+.cmp-item .cmp-title{font-size:13.5px;font-weight:700;margin-bottom:6px}
+.cmp-line{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted);margin:3px 0}
+.cmp-line .nm{flex:0 0 128px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmp-line .bar{flex:1}
+.cmp-line .vl{flex:0 0 30px;text-align:right;color:var(--text);font-weight:700}
+
+/* Data / help */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.btn-row .btn{flex:1 1 150px}
+details.panel summary{cursor:pointer;font-weight:700;font-size:16px;min-height:32px}
+details.panel p,details.panel li{font-size:14px;color:var(--muted)}
+details.panel table{border-collapse:collapse;font-size:13.5px;margin:10px 0}
+details.panel th,details.panel td{border:1px solid var(--line);padding:6px 10px;text-align:left}
+footer{color:var(--muted2);font-size:12.5px;text-align:center;margin-top:36px}
+
+/* Toast & modal */
+#toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,80px);background:#0f766e;color:#fff;font-weight:700;padding:13px 20px;border-radius:12px;box-shadow:var(--shadow);z-index:100;opacity:0;transition:all .25s;max-width:92vw;text-align:center;font-size:14.5px;pointer-events:none}
+#toast.show{transform:translate(-50%,0);opacity:1}
+#toast.err{background:#9f1239}
+.modal-back{position:fixed;inset:0;background:rgba(3,7,11,.72);display:none;place-items:center;z-index:90;padding:16px}
+.modal-back.show{display:grid}
+.modal{background:var(--card2);border:1px solid var(--line);border-radius:var(--radius);padding:22px;max-width:440px;width:100%;box-shadow:var(--shadow)}
+.modal h3{margin:0 0 8px;font-size:18px}
+.modal p{color:var(--muted);font-size:14.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.modal .btn-row{margin-top:16px}
+.hidden{display:none!important}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ===== v2 additions ===== */
+body.lock{overflow:hidden}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+.only-m,.fab{display:none}
+.alert{margin-top:12px;border-radius:var(--radius-s);padding:10px 14px;font-size:13.5px;border:1px solid var(--line);background:var(--bg2);color:var(--muted)}
+.alert.warn{background:var(--amber-soft);border-color:rgba(245,184,76,.45);color:#fde9bd}
+.alert.err{background:var(--rose-soft);border-color:rgba(251,113,133,.5);color:#fecdd3}
+.alert .btn-row{margin-top:8px}
+.alert .btn-row .btn{flex:0 1 auto}
+.filter-box{margin-top:8px}
+.fab{position:fixed;right:max(16px,env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));z-index:40;height:56px;border-radius:28px;padding:0 22px;box-shadow:var(--shadow);font-size:16px}
+.tray{position:fixed;left:0;right:0;bottom:0;z-index:45;background:var(--card2);border-top:2px solid var(--accent);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.tray .btn-row .btn{flex:0 1 auto}
+body.has-tray{padding-bottom:84px}
+body.has-tray .fab{bottom:calc(84px + env(safe-area-inset-bottom))}
+@media(max-width:700px){
+  .only-m{display:inline-flex}.only-d{display:none!important}.fab{display:inline-flex}
+  .filter-box{display:none}.filter-box.open{display:flex}.filter-box select{flex:1 1 140px}
+  header{padding-top:18px}.tagline{font-size:13px}
+}
+.scorepair{display:flex;gap:26px;margin:14px 0 4px;flex-wrap:wrap}
+.scorepair .sp-l{font-size:12.5px;color:var(--muted)}
+.score-big.sub{color:#fcd34d}
+.bar.prov>i{opacity:.55}
+.badge-rank{white-space:normal}
+table.compare .rowlabel{position:sticky;left:0;z-index:1}
+table.compare th.rowlabel{z-index:2}
+/* form sheet */
+#formSection{position:fixed;inset:0;z-index:60;margin:0;background:var(--bg);overflow-y:auto;overscroll-behavior:contain}
+.sheet{max-width:760px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;padding:0 16px}
+.sheet-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:calc(10px + env(safe-area-inset-top)) 0 8px;position:sticky;top:0;background:var(--bg);z-index:3}
+.sheet-head h2{font-size:18px;margin:0}
+.fsec{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin:10px 0;padding:0 16px}
+.fsec>summary{min-height:52px;display:flex;align-items:center;gap:10px;font-weight:800;cursor:pointer;font-size:16px}
+.fsec[open]>summary{border-bottom:1px solid var(--line);margin-bottom:14px}
+.fsec>div{padding-bottom:16px}
+.sum-sub{font-size:12.5px;font-weight:600;color:var(--amber)}
+.rating-block{margin-top:0;border-top:0;padding-top:0}
+.form-actions{position:sticky;bottom:0;margin:auto -16px 0;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:var(--card2);border-top:1px solid var(--line);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.form-actions .btn{flex:1 1 120px}
+.form-actions #btnSave{flex:2 1 180px}
+.dock{flex:1 1 100%;display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:12.5px;color:var(--muted)}
+.dock b{font-size:22px;color:var(--text);margin-right:4px}
+.dock span.amber b{color:#fcd34d}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:6px}
+.seg button{background:var(--bg2);border:0;padding:8px 16px;min-height:44px;font-weight:700}
+.seg button[aria-pressed=true]{background:var(--accent-d);color:#fff}
+.chips8{display:flex;gap:6px;margin:10px 0;overflow-x:auto;padding-bottom:4px}
+.chips8 button{flex:0 0 auto;min-width:44px;min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);font-weight:800}
+.chips8 button.done{background:var(--accent-soft);border-color:var(--accent)}
+.chips8 button.cur{border:2px solid var(--amber)}
+.rnav{display:flex;gap:8px;margin-top:12px;align-items:center}
+.rnav .btn{flex:1}
+.rnav .cnt{flex:0 0 auto;color:var(--muted);font-size:13px}
+#ratingRows.guided .rating-row{display:none}
+#ratingRows.guided .rating-row.cur{display:block;border:0}
+#ratingRows.guided .rname{font-size:19px}
+#ratingRows.guided .rating-current{text-align:left;margin:6px 0 0;padding:0}
+#ratingRows.guided .rate-btns{display:flex;flex-direction:column-reverse;gap:8px;margin-top:12px}
+#ratingRows.guided .rate-btns button{min-height:58px;display:flex;align-items:center;justify-content:center;gap:12px;font-size:20px}
+#ratingRows.guided .rate-btns button small{display:inline;font-size:14px}
+.ok-note{background:var(--accent-soft);border:1px solid var(--accent-d);border-radius:var(--radius-s);padding:8px 12px;font-size:13.5px;margin-top:6px}
+.ok-note .btn{margin-top:6px}
+#toast{bottom:calc(86px + env(safe-area-inset-bottom));display:flex;gap:12px;align-items:center;justify-content:center}
+body.has-tray #toast{bottom:calc(150px + env(safe-area-inset-bottom))}
+#toast.act{pointer-events:auto}
+.toast-act{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.55);color:#fff;border-radius:8px;padding:8px 14px;min-height:44px;font-weight:800}
+.modal input{width:100%;min-height:48px;margin-top:8px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius-s);padding:10px 12px;font-size:16px}
+
+/* ===== v3 additions ===== */
+[hidden]{display:none!important}
+.hint2{font-size:12.5px;color:var(--muted2);margin:0 0 10px}
+.fcat{border:1px solid var(--line);border-radius:12px;margin:10px 0;padding:0 12px;background:var(--bg2)}
+.fcat>summary{min-height:48px;display:flex;align-items:center;gap:8px;font-weight:700;cursor:pointer}
+.fcat .cnt{font-size:12px;color:var(--amber);font-weight:600}
+.frow{padding:10px 0;border-top:1px solid rgba(42,63,85,.55)}
+.fname{font-weight:700;font-size:15px}
+.pri{font-size:11px;color:var(--accent);border:1px solid var(--accent-d);border-radius:999px;padding:0 6px;margin-left:4px;font-weight:700}
+.fhint{font-size:12.5px;color:var(--muted2);margin:2px 0 8px}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.tri.four{grid-template-columns:repeat(2,1fr)}
+@media(min-width:480px){.tri.four{grid-template-columns:repeat(4,1fr)}}
+.tri button,.topt button{min-height:46px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-weight:700;padding:4px 6px;font-size:14px}
+.tri button[aria-pressed=true],.topt button[aria-pressed=true]{background:var(--accent-d);border-color:var(--accent);color:#fff}
+.tri button[aria-pressed=true]::before,.topt button[aria-pressed=true]::before{content:"✔ "}
+.tri button[data-fv=absent][aria-pressed=true],.tri button[data-tv=bad][aria-pressed=true]{background:#9f1239;border-color:var(--rose)}
+.tri button[data-tv=mixed][aria-pressed=true]{background:#b45309;border-color:var(--amber)}
+.tri button[data-fv=unknown][aria-pressed=true],.tri button[data-tv=unknown][aria-pressed=true]{background:#334155;border-color:#64748b}
+.topt{display:flex;gap:6px;margin-top:6px;align-items:center;flex-wrap:wrap}
+.topt span{font-size:12.5px;color:var(--muted)}
+.topt button{flex:1 1 80px}
+.fnote{font-size:12.5px;color:var(--amber);margin-top:6px}
+.fsum{line-height:1.75}
+details.fdet{margin-top:6px}
+details.fdet>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:700;color:var(--accent)}
+.fdet .fgrp{font-size:13.5px;color:var(--muted);margin:6px 0;overflow-wrap:anywhere;white-space:pre-wrap}
+.fdet .fgrp b{color:var(--text)}
+td.secrow{background:var(--card2);padding:4px 8px}
+td.catrow{background:var(--bg2);color:var(--amber);font-size:12.5px;font-weight:700}
+.f-p{color:#86efac}.f-a{color:#fda4af}.f-u{color:var(--muted)}
+.cmem{white-space:pre-wrap}
+.spec-grid{display:grid;grid-template-columns:1fr;gap:12px}
+#toast{width:max-content;max-width:min(92vw,440px)}
+.toast-act{white-space:nowrap;flex:0 0 auto}
+
+/* 操作領域と、固定要素を避けたスクロール位置 */
+html{scroll-padding-block:85px 125px}
+#formSection{scroll-padding-block:78px 135px}
+.btn-small,.store-chips button,.fdet summary,details.panel summary{min-height:44px}
+.fdet summary{align-content:center}
+.toolbar select,.field,.card-head>div,.toolbar input[type="search"]{min-width:0;max-width:100%}
+.alert,.fgrp,.modal,.toolbar select{overflow-wrap:anywhere}
+.modal{max-height:100%;overflow:auto}
+.modal-back{grid-template-rows:minmax(0,1fr)}
+#toast:not(.show){visibility:hidden}
+#toast.show{visibility:visible}
+table.compare{table-layout:fixed;width:max(100%,var(--compare-width,560px))}
+table.compare .rowlabel{width:145px;white-space:normal}
+table.compare th.rowlabel{font-weight:normal}
+#compareSection{scroll-margin-top:14px}
+@media(max-width:700px){
+  .toolbar{position:static}
+  html{scroll-padding-top:16px}
+  .rate-btns{grid-template-columns:repeat(3,minmax(44px,1fr))}
+  #ratingRows.guided .rate-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  #ratingRows.guided .rate-btns button{min-height:48px;gap:5px;font-size:17px}
+  #ratingRows.guided .rate-btns button small{font-size:12px}
+  .sheet{padding-inline:12px}
+  .fsec{padding-inline:12px}
+  .form-actions{margin-inline:-12px;padding-inline:12px}
+  .form-actions .btn,.form-actions #btnSave{flex:1 1 0;min-width:0}
+  .dock{gap:4px 12px}
+  .dock b{font-size:18px}
+  .tray{padding-inline:12px;gap:4px}
+  .tray .btn-row{gap:6px}
+  body.has-tray .fab{bottom:calc(115px + env(safe-area-inset-bottom))}
+  body.has-tray #toast{bottom:calc(180px + env(safe-area-inset-bottom))}
+  table.compare .rowlabel{width:112px}
+}
+@media(max-height:520px){
+  .sheet-head,.form-actions{position:static}
+  #formSection{scroll-padding-block:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true">🪑</div>
+    <div>
+      <h1>チェア試座ノート</h1>
+      <p class="tagline">店頭で座って、その場で記録。帰宅後にじっくり比較して、納得の一脚を選ぶためのノートです。</p>
+    </div>
+  </div>
+  <div class="profile-chips" aria-label="あなたの条件">
+    <span class="chip">身長 <b>175cm</b></span>
+    <span class="chip">PC使用 <b>1日5〜8時間</b></span>
+    <span class="chip">椅子の予算 <b>10万円以内</b></span>
+    <span class="chip">優先 <b>座り心地 ＞ 機能・耐久性・高級感</b></span>
+    <span class="chip">座面 <b>メッシュ／クッション両方を比較</b></span>
+  </div>
+  <div class="notice" role="note">
+    <b>保存先について：</b>記録はこの端末・このブラウザの中（localStorage）に自動保存されます。<b>スマホとPCでは自動同期されません。</b>
+    旧HTMLから移行する場合は旧版で「JSONで書き出す」を実行し、このHTMLで「JSONを読み込む」を選びます。HTMLの名前や保存場所を変えると、以前の記録が自動で表示されない場合があります。<br>
+    店頭で入力した後は「JSONで書き出す」からファイルを書き出し、比較したいPCで「JSONを読み込む」してください。大切な記録は定期的な書き出しがおすすめです。
+  </div>
+  <div id="alerts"></div>
+  <div class="stats" id="stats" aria-live="polite"></div>
+</header>
+
+<div class="toolbar" role="search">
+  <div class="toolbar-row">
+    <input type="search" id="searchInput" placeholder="製品名・メーカー・店舗・メモで検索" aria-label="検索">
+    <button class="btn only-m" id="btnFilters" type="button" aria-expanded="false" aria-controls="filterBox">絞り込み</button>
+    <button class="btn btn-primary only-d" id="btnNew" type="button">＋ 新規登録</button>
+  </div>
+  <div class="toolbar-row filter-box" id="filterBox">
+    <select id="filterVerdict" aria-label="候補判定で絞り込み">
+      <option value="">判定：すべて</option>
+      <option value="candidate">有力候補のみ</option>
+      <option value="hold">保留のみ</option>
+      <option value="exclude">除外のみ</option>
+      <option value="none">未判定のみ</option>
+    </select>
+    <select id="filterSeat" aria-label="座面タイプで絞り込み">
+      <option value="">座面：すべて</option>
+      <option value="mesh">メッシュ座面</option>
+      <option value="cushion">クッション座面</option>
+      <option value="hybrid">ハイブリッド／その他</option>
+    </select>
+    <select id="filterFeat" aria-label="搭載機能で絞り込み">
+      <option value="">機能：すべて</option>
+      <option value="highDone">重要機能14項目を全て確認済み</option>
+      <option value="highPending">重要機能に未確認あり</option>
+      <option value="headrest">ヘッドレスト搭載</option>
+    </select>
+    <select id="sortSelect" aria-label="並び替え">
+      <option value="total">総合スコアが高い順</option>
+      <option value="comfort">座り心地スコアが高い順</option>
+      <option value="price">価格が安い順</option>
+      <option value="recent">最近記録した順</option>
+    </select>
+    <label class="checkline"><input type="checkbox" id="filterBudget"> 予算内（10万円以下）のみ</label>
+  </div>
+</div>
+
+
+
+<section aria-labelledby="listTitle">
+  <div class="sec-head"><h2 id="listTitle">記録したチェア</h2><span class="sub" id="listCount"></span></div>
+  <div id="chairList"></div>
+</section>
+
+<section id="compareSection" class="hidden" aria-labelledby="compareTitle">
+  <div class="sec-head"><h2 id="compareTitle">比較</h2><span class="sub">カードの「比較」にチェックした2〜4製品を並べます。各項目で最も高い評価を色付きで示します。</span></div>
+  <div class="compare-scroll" tabindex="0" role="region" aria-label="比較表・横にスクロールできます"><table class="compare" id="compareTable"></table></div>
+  <div class="cmp-bars" id="compareBars"></div>
+  <div class="btn-row" style="margin-top:14px">
+    <button class="btn" id="btnCopyCompare" type="button">比較結果を要約コピー</button>
+    <button class="btn" id="btnCopyCompareDetail" type="button">比較結果を詳細コピー</button>
+    <label class="checkline"><input id="omitCompareUnknown" type="checkbox">詳細コピーで未確認を省く</label>
+    <button class="btn btn-ghost" id="btnClearCompare" type="button">比較の選択をすべて外す</button>
+  </div>
+</section>
+
+<section aria-labelledby="dataTitle">
+  <div class="sec-head"><h2 id="dataTitle">データ管理</h2><span class="sub">スマホ→PCへの移動やバックアップに使ってください</span></div>
+  <div class="panel">
+    <div class="btn-row">
+      <button class="btn" id="btnExportJson" type="button">JSONで書き出す</button>
+      <button class="btn" id="btnImportJson" type="button">JSONを読み込む</button>
+      <input type="file" id="importFile" accept=".json,application/json" class="sr-only" aria-label="JSONファイルを選択" tabindex="-1">
+      <button class="btn" id="btnExportCsv" type="button">CSVで書き出す（Excel用）</button>
+      <button class="btn" id="btnCopyAll" type="button">全記録を要約コピー</button>
+      <button class="btn" id="btnCopyAllDetail" type="button">全記録を詳細コピー</button>
+      <button class="btn" id="btnSample" type="button">サンプルデータを追加</button>
+      <button class="btn btn-danger" id="btnClearAll" type="button">全データを削除</button>
+    </div>
+    <label class="checkline"><input id="omitAllUnknown" type="checkbox">詳細コピーで未確認を省く</label>
+    <p id="backupStatus" style="color:var(--text);font-size:13.5px;margin:14px 0 0"></p>
+    <p style="color:var(--muted);font-size:13.5px;margin:8px 0 0">
+      読み込み（インポート）は上書きではなく<b style="color:var(--text)">マージ</b>です。同じIDの記録は<b style="color:var(--text)">更新日時が新しい方</b>を採用し、新しいIDの記録は追加されます。取り込み前に件数を確認でき、直後なら「元に戻す」もできます。既存の記録が勝手に消えることはありません。<br>
+      CSVはUTF-8（BOM付き）で書き出すので、Excelで開いても文字化けしません。「=」「+」「-」「@」で始まる文字は、Excelに数式として実行されないよう先頭に「'」を付けて書き出します。
+    </p>
+  </div>
+</section>
+
+<section>
+  <details class="panel">
+    <summary>スコアの計算方法と使い方のコツ</summary>
+    <p><b style="color:var(--text)">総合スコア</b> ＝ Σ（評価点 × 項目の重み）÷ Σ（評価済み項目の重み）× 20（100点満点）。未評価の項目は計算から除外されるので、0点扱いにはなりません。未評価がある場合は「暫定」と表示されます。全項目3点なら60点、全項目5点なら100点です。</p>
+    <p><b style="color:var(--text)">座り心地スコア</b> は、座面（25%）・背もたれ（20%）・腰（15%）の3項目だけで同じ式で計算したスコアです。価格や見た目に引っ張られず「座り心地だけ」で比べたいときに使ってください。</p>
+    <table>
+      <tr><th>評価項目</th><th>重み</th><th>見るポイント（身長175cm・1日5〜8時間利用の目安）</th></tr>
+      <tr><td>座面の快適さ</td><td>25%</td><td>太もも裏の圧迫、沈み込み、長時間でのお尻の痛み</td></tr>
+      <tr><td>背もたれ・姿勢の安定性</td><td>20%</td><td>肩甲骨までの支え、姿勢が崩れにくいか</td></tr>
+      <tr><td>腰のサポート</td><td>15%</td><td>ランバーの位置が腰に合うか（高さ・張り出し調整）</td></tr>
+      <tr><td>肘掛けの使いやすさ</td><td>10%</td><td>肘が自然に置ける高さか、キーボード操作で邪魔にならないか</td></tr>
+      <tr><td>ヘッドレスト</td><td>8%</td><td>後頭部〜首に当たる位置、リクライニング時の支え</td></tr>
+      <tr><td>リクライニング</td><td>7%</td><td>反発調整の範囲、休憩時にくつろげるか</td></tr>
+      <tr><td>質感・剛性感</td><td>10%</td><td>きしみ・ぐらつき、レバーの操作感、耐久性の手がかり</td></tr>
+      <tr><td>蒸れにくさ</td><td>5%</td><td>背中・お尻の熱のこもり（10分以上座ると分かりやすい）</td></tr>
+    </table>
+    <ul>
+      <li>店頭では、まず製品名・店舗・価格だけ入れて保存し、座りながら評価をタップしていくと忘れにくいです。</li>
+      <li>同じ店舗で比べるときは試座時間をそろえると、蒸れや疲れの比較が正確になります。</li>
+      <li>迷ったら「有力候補」だけに絞り込み、比較にチェックを入れて項目ごとの勝ち負けを見てください。</li>
+      <li>搭載機能（24項目）とフィット感（5項目）は「仕様」と「自分に合うか」の記録で、点数・順位には加減算されません。「未確認」は「非搭載」ではありません。</li>
+      <li>コスパ表示は「総合スコア ÷ 価格 × 1万円」です。安さだけでなくスコアとのバランスを見る目安にしてください。</li>
+    </ul>
+  </details>
+</section>
+
+<footer>チェア試座ノート｜データはこのブラウザにのみ保存されます ・ 価格は試座時点の記録です。購入前に最新価格と保証内容をご確認ください。</footer>
+</div>
+
+<section id="formSection" class="hidden" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+<form id="chairForm" class="sheet" novalidate>
+  <div class="sheet-head"><h2 id="formTitle">新しいチェアを登録</h2><button type="button" class="btn btn-ghost btn-small" id="btnCloseTop">閉じる</button></div>
+  <div class="ok-note hidden" id="draftNote"></div>
+  <details class="fsec" open><summary>基本情報</summary>
+    <div class="form-grid">
+      <div class="field"><label for="f-maker">メーカー</label><input id="f-maker" type="text" maxlength="80" autocomplete="off" placeholder="例：オカムラ、エルゴヒューマン、AKRacing"></div>
+      <div class="field"><label for="f-name">製品名 <span class="req">*必須</span></label><input id="f-name" type="text" maxlength="120" autocomplete="off" placeholder="例：シルフィー、Pro2 Ottoman" required></div>
+      <div class="field full"><label>試座店舗（よく行く店舗）</label><div class="store-chips" id="storeChips"></div></div>
+      <div class="field"><label for="f-store">試座店舗</label><input id="f-store" type="text" maxlength="120" autocomplete="off" placeholder="例：エディオン ○○店"></div>
+      <div class="field"><label for="f-date">試座日</label><input id="f-date" type="date"></div>
+      <div class="field"><label for="f-price">税込価格（円）</label><input id="f-price" type="number" inputmode="numeric" min="0" max="99999999" step="1" placeholder="例：79800"><span class="hint">未入力でも登録できます。</span></div>
+      <div class="field"><label for="f-duration">試座時間（分）</label><input id="f-duration" type="number" inputmode="numeric" min="0" max="1440" step="1" placeholder="例：15"><span class="hint">10分以上座ると腰・蒸れの違いが出やすいです。</span></div>
+      <div class="field"><label for="f-verdict">候補判定</label><select id="f-verdict"><option value="">未判定</option><option value="candidate">有力候補</option><option value="hold">保留</option><option value="exclude">除外</option></select></div>
+      <div class="field"><label for="f-seatType">座面タイプ</label><select id="f-seatType"><option value="">不明・未記録</option><option value="mesh">メッシュ座面</option><option value="cushion">クッション座面</option><option value="hybrid">ハイブリッド／その他</option></select></div>
+    </div>
+  </details>
+  <details class="fsec" open id="ratingSec"><summary>5段階評価 <span class="sum-sub" id="ratingProg"></span></summary>
+    <div class="rating-block">
+      <div class="seg" role="group" aria-label="入力方法"><button type="button" id="modeGuided" aria-pressed="true">ひとつずつ</button><button type="button" id="modeList" aria-pressed="false">一覧</button></div>
+      <p class="sub" style="margin:4px 0 0;font-size:12.5px;color:var(--muted2)">1=不満 ／ 2=やや不満 ／ 3=普通 ／ 4=満足 ／ 5=非常に満足。同じ数字をもう一度押すと未評価に戻ります。</p>
+      <div class="chips8" id="ratingChips" aria-label="評価項目の移動"></div>
+      <div id="ratingRows"></div>
+      <div class="rnav" id="ratingNav"><button type="button" class="btn" id="ratingPrev">← 前へ</button><span class="cnt" id="ratingCount"></span><button type="button" class="btn" id="ratingNext">次へ →</button></div>
+    </div>
+  </details>
+  <details class="fsec" id="featSec"><summary>搭載機能 <span class="sum-sub" id="featProg"></span></summary>
+    <div>
+      <p class="hint2">展示品で確認できたものだけ記録します。分からない項目は「未確認」のままにしてください（未確認は非搭載ではありません）。搭載機能は点数に影響しません。</p>
+      <div class="seg" role="group" aria-label="表示する機能"><button type="button" id="featModeKey" aria-pressed="true">重要機能（14）</button><button type="button" id="featModeAll" aria-pressed="false">すべて（24）</button></div>
+      <label class="checkline"><input type="checkbox" id="featOnlyUnknown"> 未確認だけ表示</label>
+      <div id="featRows"></div>
+      <div id="featWarn"></div>
+      <div class="form-grid" style="margin-top:12px">
+        <div class="field full"><label for="f-customFeatures">その他・独自の機能（自由記入）</label><textarea id="f-customFeatures" maxlength="5000" placeholder="例：独自サスペンション機構（24項目に当てはまらないもの）"></textarea></div>
+        <div class="field full"><label for="f-featureMemo">搭載機能・調整のメモ</label><textarea id="f-featureMemo" maxlength="5000" placeholder="例：右肘が少しぐらつく、ヘッドレストはオプション（店員の説明）"></textarea></div>
+      </div>
+    </div>
+  </details>
+  <details class="fsec" id="fitSec"><summary>体格へのフィット感 <span class="sum-sub" id="fitProg"></span></summary>
+    <div>
+      <p class="hint2">機能の有無ではなく「自分の体に合うか」の記録です（身長175cmなど）。点数には影響しません。</p>
+      <div id="fitRows"></div>
+      <div id="fitWarn"></div>
+      <div class="form-grid" style="margin-top:12px">
+        <div class="field full"><label for="f-fitMemo">フィット感のメモ</label><textarea id="f-fitMemo" maxlength="5000" placeholder="例：座面を下げきっても足が浮き気味、ランバーを弱くすると合う"></textarea></div>
+      </div>
+    </div>
+  </details>
+  <details class="fsec"><summary>感想・メモ</summary>
+    <div class="form-grid">
+      <div class="field full"><label for="f-good">良かった点</label><textarea id="f-good" maxlength="5000" placeholder="例：腰がしっかり支えられる、座面が沈みすぎない"></textarea></div>
+      <div class="field full"><label for="f-bad">気になった点</label><textarea id="f-bad" maxlength="5000" placeholder="例：ヘッドレストが頭に合わない、肘掛けがぐらつく"></textarea></div>
+      <div class="field full"><label for="f-memo">自由メモ</label><textarea id="f-memo" maxlength="5000" placeholder="例：保証年数、展示品の状態、店員さんの説明、再訪時に確認したいこと"></textarea></div>
+    </div>
+  </details>
+  <details class="fsec" id="specSec"><summary>仕様の数値（任意）</summary>
+    <div>
+      <p class="hint2">分からない項目は空欄のままにします（0にはなりません）。出典（製品ページ・値札・店員の説明・実物確認）は「機能のメモ」に残すと後で確認できます。角度の定義はメーカーで異なることがあります。</p>
+      <div class="spec-grid">
+        <div class="field"><label for="f-specMax">最大リクライニング角度（°）</label><input id="f-specMax" type="number" inputmode="decimal" step="any" min="60" max="180" placeholder="例：125（60〜180）"></div>
+        <div class="field"><label for="f-specWarranty">保証期間（年）</label><input id="f-specWarranty" type="number" inputmode="decimal" step="any" min="0.1" max="30" placeholder="例：3（0.1〜30）"><span class="hint">部品別の違いはメモ欄へ</span></div>
+        <div class="field"><label for="f-specLoad">公称耐荷重（kg）</label><input id="f-specLoad" type="number" inputmode="decimal" step="any" min="20" max="500" placeholder="例：120（20〜500）"><span class="hint">メーカー公称値を記録します</span></div>
+      </div>
+    </div>
+  </details>
+  <div class="error-msg" id="formError" role="alert"></div>
+  <div class="form-actions">
+    <div class="dock" aria-live="polite">
+      <span><b id="dockTotal">—</b>総合</span>
+      <span class="amber"><b id="dockComfort">—</b>座り心地</span>
+      <span><b id="dockCov" style="font-size:16px">0/8項目</b>評価済み</span>
+      <span class="badge" id="dockState">未評価</span>
+    </div>
+    <button type="submit" class="btn btn-primary" id="btnSave">保存する</button>
+    <button type="button" class="btn btn-ghost" id="btnCancelEdit">閉じる</button>
+  </div>
+</form>
+</section>
+
+<div id="toast" role="status" aria-live="polite"></div>
+<button class="btn btn-primary fab" id="btnFab" type="button" aria-label="新規登録">＋ 新規登録</button>
+<div class="tray hidden" id="tray"><b id="trayText"></b><div class="btn-row"><button class="btn btn-small btn-primary" id="btnShowCompare" type="button">比較を見る</button><button class="btn btn-small btn-ghost" id="btnTrayClear" type="button">解除</button></div></div>
+
+<div class="modal-back" id="modalBack">
+  <div class="modal" role="alertdialog" aria-modal="true" aria-labelledby="modalTitle" aria-describedby="modalText">
+    <h3 id="modalTitle">確認</h3>
+    <p id="modalText"></p>
+    <input id="modalPhrase" class="hidden" type="text" autocomplete="off" aria-label="確認のため入力">
+    <div class="btn-row">
+      <button class="btn btn-danger" id="modalOk" type="button">実行する</button>
+      <button class="btn btn-ghost" id="modalCancel" type="button">キャンセル</button>
+    </div>
+  </div>
+</div>
+<script>
+"use strict";
+/* ============================================================
+   チェア試座ノート
+   - 単一ファイル / 外部ライブラリなし / localStorage保存
+   - 純粋な計算ロジックは PURE-LOGIC 区間に分離（テスト可能に）
+   ============================================================ */
+
+/*PURE-LOGIC-START*/
+const CRITERIA = [
+  { key:"seat",    label:"座面の快適さ",           weight:25, hint:"座り心地・圧力分散・長時間の疲れにくさ" },
+  { key:"back",    label:"背もたれ・姿勢の安定性", weight:20, hint:"背中のフィット感と姿勢の保ちやすさ" },
+  { key:"lumbar",  label:"腰のサポート",           weight:15, hint:"ランバーサポートの効き具合・調整しやすさ" },
+  { key:"arm",     label:"肘掛けの使いやすさ",     weight:10, hint:"高さ・前後左右の調整と安定感" },
+  { key:"head",    label:"ヘッドレスト",           weight:8,  hint:"首・頭の支えと調整範囲" },
+  { key:"recline", label:"リクライニング",         weight:7,  hint:"角度・反発の調整とくつろぎ感" },
+  { key:"quality", label:"質感・剛性感",           weight:10, hint:"きしみ・ぐらつきのなさと高級感" },
+  { key:"breath",  label:"蒸れにくさ",             weight:5,  hint:"通気性・熱のこもりにくさ" }
+];
+const COMFORT_KEYS = ["seat","back","lumbar"];
+const SCORE_LABELS = { 1:"不満", 2:"やや不満", 3:"普通", 4:"満足", 5:"非常に満足" };
+
+/* ===== v3: 搭載機能24項目・フィット感5項目・仕様数値（キーは固定。ラベルや表示順を変えても保存キーは変えない） ===== */
+const FEAT_CATS = ["座面","背もたれ","腰","肘掛け","ヘッドレスト","リクライニング","フットレスト","その他"];
+const FEATURES = [
+  { key:"seat_height", cat:"座面", label:"座面高さ調整", pri:"high", hint:"上下調節が可能か" },
+  { key:"seat_depth", cat:"座面", label:"座面奥行き調整", pri:"high", hint:"前後スライドなど" },
+  { key:"seat_forward_tilt", cat:"座面", label:"座面前傾機能", pri:"mid", hint:"前方に傾けられるか" },
+  { key:"seat_angle", cat:"座面", label:"座面角度調整", pri:"mid", hint:"前傾以外も含め独立調整可能か" },
+  { key:"back_height", cat:"背もたれ", label:"背もたれ高さ調整", pri:"mid", hint:"背もたれ自体を上下できるか" },
+  { key:"back_angle_independent", cat:"背もたれ", label:"背もたれ独立角度調整", pri:"mid", hint:"座面との連動とは別に角度調整できるか" },
+  { key:"sync_tilt", cat:"背もたれ", label:"シンクロロッキング", pri:"high", hint:"背・座面が連動するロッキング機構" },
+  { key:"lumbar_support", cat:"腰", label:"ランバーサポート", pri:"high", hint:"腰を支える機構があるか" },
+  { key:"lumbar_height", cat:"腰", label:"ランバー高さ調整", pri:"high", hint:"上下調整できるか" },
+  { key:"lumbar_depth", cat:"腰", label:"ランバー前後・強度調整", pri:"high", hint:"張り出し・硬さを調整できるか" },
+  { key:"arm_height", cat:"肘掛け", label:"肘掛け高さ調整", pri:"high", hint:"上下調整できるか" },
+  { key:"arm_frontback", cat:"肘掛け", label:"肘掛け前後調整", pri:"high", hint:"肘パッドの前後移動" },
+  { key:"arm_leftright", cat:"肘掛け", label:"肘掛け左右調整", pri:"mid", hint:"肘パッドの左右移動" },
+  { key:"arm_rotation", cat:"肘掛け", label:"肘掛け回転調整", pri:"mid", hint:"肘パッドの回転（内外向き）" },
+  { key:"arm_flipup", cat:"肘掛け", label:"肘掛け跳ね上げ", pri:"mid", hint:"上方向に退避できるか" },
+  { key:"headrest", cat:"ヘッドレスト", label:"ヘッドレスト搭載", pri:"high", hint:"試座した構成にあるか" },
+  { key:"headrest_height", cat:"ヘッドレスト", label:"ヘッドレスト高さ調整", pri:"high", hint:"頭の高さに合わせられるか" },
+  { key:"headrest_angle_depth", cat:"ヘッドレスト", label:"ヘッドレスト角度・前後調整", pri:"high", hint:"角度または前後調整が可能か（どちらかのみなら備考へ）" },
+  { key:"recline", cat:"リクライニング", label:"リクライニング機能", pri:"high", hint:"背を倒せるか" },
+  { key:"recline_tension", cat:"リクライニング", label:"リクライニング反発力調整", pri:"high", hint:"倒れる際の抵抗を調整可能か" },
+  { key:"recline_lock", cat:"リクライニング", label:"リクライニング角度固定・ロック", pri:"high", hint:"任意または段階的な位置固定が可能か" },
+  { key:"footrest", cat:"フットレスト", label:"オットマン・フットレスト搭載", pri:"mid", hint:"展示品に装備されているか" },
+  { key:"footrest_retractable", cat:"フットレスト", label:"収納式オットマン", pri:"mid", hint:"座面下への収納・展開が可能か" },
+  { key:"arm_width", cat:"その他", label:"アームレスト全体の幅調整", pri:"mid", hint:"左右肘掛けの間隔調整（肘パッド調整とは別）" }
+];
+const FIT_ITEMS = [
+  { key:"seat_fit", label:"座面の高さ・奥行き", short:"座面", hint:"足裏が着くか、太もも裏が圧迫されないか", rel:["seat_height","seat_depth"] },
+  { key:"lumbar_fit", label:"腰のサポート位置", short:"腰", hint:"腰の位置に合うか、過剰な押し出しがないか", rel:["lumbar_support"] },
+  { key:"arm_fit", label:"肘掛けの調整範囲", short:"肘", hint:"自然に肘を置けるか、机・キーボード操作で邪魔にならないか", rel:["arm_height"] },
+  { key:"headrest_fit", label:"ヘッドレストの位置", short:"頭", hint:"首・後頭部の位置が合うか", rel:["headrest"] },
+  { key:"recline_fit", label:"リクライニングの調整範囲", short:"リクライニング", hint:"休憩姿勢と普段の作業姿勢に合うか", rel:["recline"] }
+];
+const FIT_LABELS = { unknown:"未確認", good:"合う", mixed:"微妙", bad:"合わない" };
+const SPEC_DEFS = [
+  { key:"maxReclineDeg", label:"最大リクライニング角度", unit:"°", min:60, max:180, field:"f-specMax" },
+  { key:"warrantyYears", label:"保証期間", unit:"年", min:0.1, max:30, field:"f-specWarranty" },
+  { key:"loadCapacityKg", label:"公称耐荷重", unit:"kg", min:20, max:500, field:"f-specLoad" }
+];
+function emptyFeatures(){ const o = {}; for (const f of FEATURES) o[f.key] = "unknown"; return o; }
+function emptyFit(){ const o = {}; for (const f of FIT_ITEMS) o[f.key] = "unknown"; return o; }
+function emptySpecs(){ const o = {}; for (const d of SPEC_DEFS) o[d.key] = null; return o; }
+const isObj = (v) => v && typeof v === "object" && !Array.isArray(v);
+function reportUnknown(raw, allowed, label, bad){
+  if (!isObj(raw)) return;
+  for (const k of Object.keys(raw)) {
+    if (!allowed.includes(k)) bad(label + "の未知キー「" + k.slice(0, 40) + "」を除外");
+  }
+}
+function normFeatures(rawF, rawO, issues){
+  const bad = (m) => { if (issues) issues.push(m); };
+  const features = emptyFeatures(), featureOptions = {};
+  if (rawF !== undefined && rawF !== null && !isObj(rawF)) bad("featuresの形式が不正");
+  reportUnknown(rawF, FEATURES.map(f => f.key), "features", bad);
+  reportUnknown(rawO, Object.keys(features), "featureOptions", bad);
+  if (rawO != null && !isObj(rawO)) bad("装備区分の形式が不正");
+  if (isObj(rawO)) for (const f of FEATURES) {
+    if (rawO[f.key] != null && rawF?.[f.key] !== "present") bad(f.label + "の装備区分を除外（搭載以外）");
+  }
+  for (const f of FEATURES){
+    const v = isObj(rawF) ? rawF[f.key] : undefined;
+    if (v === "present" || v === "absent" || v === "unknown") features[f.key] = v;
+    else if (v !== undefined && v !== null) bad(f.label + "の状態が不正");
+    if (features[f.key] === "present"){
+      const o = isObj(rawO) ? rawO[f.key] : undefined;
+      if (o === "standard" || o === "optional" || o === "unknown") featureOptions[f.key] = o;
+      else { featureOptions[f.key] = "unknown"; if (o !== undefined && o !== null) bad(f.label + "の装備区分が不正"); }
+    }
+  }
+  return { features, featureOptions };
+}
+function normFit(raw, issues){
+  const fit = emptyFit();
+  if (raw !== undefined && raw !== null && !isObj(raw)) { if (issues) issues.push("fitの形式が不正"); return fit; }
+  for (const f of FIT_ITEMS){
+    const v = isObj(raw) ? raw[f.key] : undefined;
+    if (v === "good" || v === "mixed" || v === "bad" || v === "unknown") fit[f.key] = v;
+    else if (v !== undefined && v !== null && issues) issues.push(f.label + "のフィット感が不正");
+  }
+  return fit;
+}
+function normSpecs(raw, issues){
+  const specs = emptySpecs();
+  if (raw !== undefined && raw !== null && !isObj(raw)) { if (issues) issues.push("specsの形式が不正"); return specs; }
+  for (const d of SPEC_DEFS){
+    const v = isObj(raw) ? raw[d.key] : undefined;
+    if (v === undefined || v === null || v === "") continue;
+    const n = typeof v === "number" ? v : (typeof v === "string" && v.trim() !== "" ? Number(v) : NaN);
+    if (Number.isFinite(n) && n >= d.min && n <= d.max) {
+      specs[d.key] = Math.round(n * 10) / 10;
+      if (v !== specs[d.key] && issues) issues.push(d.label + "を規定の数値に補正");
+    }
+    else if (issues) issues.push(d.label + "の値が不正（空欄に補正）");
+  }
+  return specs;
+}
+function featureStats(ch){
+  const f = ch.features || {}, o = ch.featureOptions || {};
+  const r = { present:0, absent:0, unknown:0, std:0, opt:0, highKnown:0, highTotal:0, total:FEATURES.length };
+  for (const d of FEATURES){
+    const v = f[d.key];
+    if (v === "present") { r.present++; if (o[d.key] === "standard") r.std++; else if (o[d.key] === "optional") r.opt++; }
+    else if (v === "absent") r.absent++; else r.unknown++;
+    if (d.pri === "high") { r.highTotal++; if (v === "present" || v === "absent") r.highKnown++; }
+  }
+  r.known = r.present + r.absent;
+  return r;
+}
+function featureText(ch, key){
+  const v = (ch.features || {})[key];
+  if (v === "present") { const o = (ch.featureOptions || {})[key]; return o === "standard" ? "搭載（標準）" : o === "optional" ? "搭載（オプション）" : "搭載（区分不明）"; }
+  return v === "absent" ? "非搭載" : "未確認";
+}
+function fitStats(ch){ const r = { good:0, mixed:0, bad:0, unknown:0 }; for (const i of FIT_ITEMS) r[(ch.fit || {})[i.key] || "unknown"]++; return r; }
+function fitNoTarget(features, item){ return item.rel.every(k => (features || {})[k] === "absent"); }
+const FEAT_DEPS = [["headrest",["headrest_height","headrest_angle_depth"]],["lumbar_support",["lumbar_height","lumbar_depth"]],["recline",["recline_tension","recline_lock"]],["footrest",["footrest_retractable"]]];
+const featLabel = (k) => (FEATURES.find(f => f.key === k) || {}).label || k;
+/* 矛盾の警告のみ（保存は妨げず、値も自動では書き換えない） */
+function featureWarnings(features, fit){
+  const feat = [], fits = [];
+  for (const [p, kids] of FEAT_DEPS) if (features[p] === "absent") for (const k of kids) if (features[k] === "present") feat.push("「" + featLabel(p) + "」が非搭載ですが、「" + featLabel(k) + "」が搭載になっています。どちらかを確認してください。");
+  for (const i of FIT_ITEMS) if (fit[i.key] !== "unknown" && fitNoTarget(features, i)) fits.push("「" + i.label + "」のフィット感が入力されていますが、関連機能（" + i.rel.map(featLabel).join("・") + "）は非搭載です。");
+  return { feat, fit: fits };
+}
+function isValidRating(v){ return Number.isInteger(v) && v >= 1 && v <= 5; }
+function toRating(v){ if (typeof v === "string" && /^\s*[1-5]\s*$/.test(v)) v = Number(v); return isValidRating(v) ? v : null; }
+
+/* 重み付きスコア。未評価(null)は除外し0点扱いしない。整数演算で丸め誤差を避ける。
+   戻り値: { total, comfort, coverage(0-1), comfortCoverage(0-1), evaluatedCount } */
+function computeScores(ratings){
+  ratings = ratings || {};
+  let sum = 0, wsum = 0, count = 0, cSum = 0, cWsum = 0;
+  for (const c of CRITERIA){
+    const v = ratings[c.key];
+    if (isValidRating(v)){
+      sum += v * c.weight; wsum += c.weight; count++;
+      if (COMFORT_KEYS.includes(c.key)){ cSum += v * c.weight; cWsum += c.weight; }
+    }
+  }
+  const totalWeight = CRITERIA.reduce((a,c)=>a+c.weight,0);
+  const comfortWeight = CRITERIA.filter(c=>COMFORT_KEYS.includes(c.key)).reduce((a,c)=>a+c.weight,0);
+  const r1 = (n, d) => Math.round(n * 200 / d) / 10;   // n/d*20 を小数1位に丸める
+  return {
+    total: wsum ? r1(sum, wsum) : null,
+    comfort: cWsum ? r1(cSum, cWsum) : null,
+    coverage: wsum / totalWeight,
+    comfortCoverage: cWsum / comfortWeight,
+    evaluatedCount: count
+  };
+}
+/* 評価の確度: none=未評価 / final=全項目 / prov=暫定(6割以上) / sparse=未評価が多い参考値 */
+function levelOf(s){ return s.total === null ? "none" : s.evaluatedCount === CRITERIA.length ? "final" : s.coverage >= 0.6 ? "prov" : "sparse"; }
+function levelLabel(s){
+  const n = s.evaluatedCount + "/" + CRITERIA.length + "項目", lv = levelOf(s);
+  return lv === "none" ? "未評価" : lv === "final" ? "確定（全" + CRITERIA.length + "項目）" : lv === "prov" ? "暫定（" + n + "）" : "参考値（" + n + "・未評価が多い）";
+}
+function costPerf(ch, s){ return (ch.price > 0 && s.total !== null) ? s.total / ch.price * 10000 : null; }
+function norm(s){ return String(s == null ? "" : s).normalize("NFKC").toLowerCase().replace(/\s+/g, " ").trim(); }
+
+/* CSV: 全文字列を引用符で囲み、数式として解釈される先頭文字(= + - @ タブ CR)には ' を付ける。数値はそのまま。 */
+function csvEscape(value){
+  if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  let s = value === null || value === undefined ? "" : String(value);
+  if (/^[\s\u200b]*[=+\-@＝＋－＠]/u.test(s) || /^[\t\r\n]/.test(s)) s = "'" + s;
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+
+/* 型・範囲を検証して正規化。不正な項目は既定値に直し issues に理由を積む。製品名が無い/オブジェクトでなければ null。 */
+function sanitizeChair(raw, issues){
+  const bad = (m) => { if (issues) issues.push(m); };
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) { bad("記録の形式が不正"); return null; }
+  const str = (k, max) => {
+    let v = raw[k];
+    if (v === null || v === undefined) return "";
+    if (typeof v === "number" && Number.isFinite(v)) { bad(k + "を文字列に補正"); v = String(v); }
+    if (typeof v !== "string") { bad(k + "の型が不正"); return ""; }
+    if (v.length > max) { bad(k + "が長すぎるため切り詰め"); v = v.slice(0, max); }
+    return v;
+  };
+  const name = str("name", 120).trim();
+  if (!name) { bad("製品名がない記録"); return null; }
+  reportUnknown(raw, ["id","name","maker","store","date","price","duration","verdict","seatType","good","bad","memo","features","featureOptions","fit","specs","featureMemo","fitMemo","customFeatures","ratings","createdAt","updatedAt"], "記録", bad);
+  const rr = raw.ratings, ratings = {};
+  reportUnknown(rr, CRITERIA.map(c => c.key), "ratings", bad);
+  reportUnknown(raw.fit, FIT_ITEMS.map(f => f.key), "fit", bad);
+  reportUnknown(raw.specs, SPEC_DEFS.map(d => d.key), "specs", bad);
+  if (rr !== undefined && rr !== null && (typeof rr !== "object" || Array.isArray(rr))) bad("ratingsの形式が不正");
+  for (const c of CRITERIA){
+    const v = rr && typeof rr === "object" ? rr[c.key] : null;
+    const r = toRating(v);
+    if (r === null && v !== null && v !== undefined && v !== "") bad(c.label + "の評価値が不正");
+    else if (r !== null && r !== v) bad(c.label + "を数値に補正");
+    ratings[c.key] = r;
+  }
+  const num = (k, max, dec) => {
+    const v = raw[k];
+    if (v === null || v === undefined || v === "") return null;
+    const n = typeof v === "number" ? v : (typeof v === "string" && v.trim() !== "" ? Number(v) : NaN);
+    if (!Number.isFinite(n) || n < 0 || n > max) { bad(k + "の値が不正"); return null; }
+    const p = Math.pow(10, dec), rounded = Math.round(n * p) / p;
+    if (v !== rounded) bad(k + "を規定の数値に補正");
+    return rounded;
+  };
+  const oneOf = (k, list) => { const v = raw[k]; if (list.includes(v)) return v; if (v !== undefined && v !== null && v !== "") bad(k + "の値が不正"); return ""; };
+  const dateOk = (s) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s); if (!m) return false; const d = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])); return d.getUTCFullYear() === +m[1] && d.getUTCMonth() === +m[2] - 1 && d.getUTCDate() === +m[3]; };
+  const dRaw = str("date", 10);
+  const date = dateOk(dRaw) ? dRaw : (dRaw && bad("dateの形式が不正"), "");
+  const ts = (k) => {
+    if (typeof raw[k] === "string" && Number.isFinite(Date.parse(raw[k]))) return raw[k];
+    if (raw[k] != null) bad(k + "が不正なため補完");
+    return null;
+  };
+  const now = new Date().toISOString(), created = ts("createdAt") || now;
+  const nf = normFeatures(raw.features, raw.featureOptions, issues);
+  const idRaw = typeof raw.id === "string" ? raw.id.trim() : "";
+  if (!idRaw || idRaw.length > 80) bad("IDを再発行");
+  return {
+    id: (idRaw && idRaw.length <= 80) ? idRaw : ("c" + Date.now().toString(36) + Math.random().toString(36).slice(2,9)),
+    name, maker: str("maker", 80).trim(), store: str("store", 120).trim(), date,
+    price: num("price", 99999999, 0), duration: num("duration", 1440, 1),
+    verdict: oneOf("verdict", ["candidate","hold","exclude"]), seatType: oneOf("seatType", ["mesh","cushion","hybrid"]),
+    good: str("good", 5000), bad: str("bad", 5000), memo: str("memo", 5000),
+    features: nf.features, featureOptions: nf.featureOptions, fit: normFit(raw.fit, issues), specs: normSpecs(raw.specs, issues),
+    featureMemo: str("featureMemo", 5000), fitMemo: str("fitMemo", 5000), customFeatures: str("customFeatures", 5000),
+    ratings, createdAt: created, updatedAt: ts("updatedAt") || created
+  };
+}
+
+/* インポートのマージ。新ID=追加、同ID=更新日時が新しい(同じ)方を採用、既存の方が新しければ既存を残す。既存記録は削除しない。 */
+function mergeImport(existing, incoming, resolveIncoming){
+  const next = existing.slice(), idx = new Map(next.map((c, i) => [c.id, i]));
+  let added = 0, updated = 0, unchanged = 0, keptNewer = 0, conflicts = 0;
+  for (const inc of incoming){
+    const i = idx.get(inc.id);
+    if (i === undefined) { idx.set(inc.id, next.length); next.push(inc); added++; continue; }
+    const cur = next[i];
+    if (JSON.stringify(cur) === JSON.stringify(inc)) { unchanged++; continue; }
+    const a = Date.parse(inc.updatedAt), b = Date.parse(cur.updatedAt);
+    if (a < b) keptNewer++;
+    else if (a === b) { if (resolveIncoming) { next[i] = inc; updated++; } else conflicts++; }   /* 同ID・同時刻で内容が違う＝競合。黙って上書きしない */
+    else { next[i] = inc; updated++; }
+  }
+  return { next, added, updated, unchanged, keptNewer, conflicts };
+}
+/*PURE-LOGIC-END*/
+
+const STORAGE_KEY = "chairTrialNote.v1";   /* Muse版と同じキー（既存データを引き継ぐ） */
+const DRAFT_KEY = "chairTrialNote.draft.v1", RAW_KEY = "chairTrialNote.v1.unreadable", PREF_KEY = "chairTrialNote.prefs.v1";
+const BUDGET = 100000;
+const VERDICT_LABELS = { candidate:"有力候補", hold:"保留", exclude:"除外", "":"未判定" };
+const SEAT_LABELS = { mesh:"メッシュ座面", cushion:"クッション座面", hybrid:"ハイブリッド／その他", "":"座面タイプ不明" };
+const STORE_PRESETS = ["エディオン","コジマ×ビックカメラ","ビックカメラ","ヤマダデンキ","ニトリ","IDC大塚家具","オフィスコム ショールーム"];
+
+let chairs = [];
+let editingId = null, editingBase = null, editingRecord = null;
+let formRatings = emptyRatings();
+let compareIds = new Set();
+let storageOk = true;
+let prefs = {};
+
+function emptyRatings(){ const r = {}; for (const c of CRITERIA) r[c.key] = null; return r; }
+function uid(){ return "c" + Date.now().toString(36) + Math.random().toString(36).slice(2,9); }
+function esc(s){ return String(s ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])); }
+function fmtPrice(n){ return n === null || n === undefined ? "価格未記録" : "¥" + Math.round(n).toLocaleString("ja-JP"); }
+function fmtDate(iso){ if(!iso) return ""; const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleDateString("ja-JP"); }
+function todayStr(){ const d = new Date(); const p = (n)=>String(n).padStart(2,"0"); return d.getFullYear()+"-"+p(d.getMonth()+1)+"-"+p(d.getDate()); }
+
+/* 復旧元のバイト列を残せた場合だけ、補正済みデータの書き込みを許可する。 */
+let storedRaw = null, recoveryRaw = null, loadNotes = "";
+function keepRaw(raw){
+  try {
+    if (localStorage.getItem(RAW_KEY) === null) localStorage.setItem(RAW_KEY, raw);
+    return localStorage.getItem(RAW_KEY) === raw;
+  } catch(e) { return false; }
+}
+function getStored(key){ try { return localStorage.getItem(key); } catch(e){ return null; } }
+function load(){
+  let raw;
+  try { raw = localStorage.getItem(STORAGE_KEY); }
+  catch(e){ storageOk = false; return; }
+  storageOk = true;
+  storedRaw = raw; recoveryRaw = null; loadNotes = "";
+  if (raw === null) { chairs = []; return; }
+  let parsed;
+  try { parsed = JSON.parse(raw); } catch(e) {}
+  const arr = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.chairs) ? parsed.chairs : null);
+  if (!arr) {
+    recoveryRaw = raw; keepRaw(raw); chairs = [];
+    loadNotes = "保存データの形式を読み取れませんでした。";
+    return;
+  }
+  const issues = [], usable = [];
+  let skipped = 0;
+  for (const [i, rawRecord] of arr.entries()) {
+    const details = [], c = sanitizeChair(rawRecord, details);
+    if (c) usable.push(c); else skipped++;
+    issues.push(...details.map(message => (i + 1) + "件目 " + message));
+  }
+  const ids = new Set(usable.map(c => c.id));
+  const duplicates = usable.length - ids.size;
+  if (duplicates) issues.push("同じIDの記録 " + duplicates + "件を統合（同日時なら先にある内容を表示）");
+  if (isObj(parsed)) reportUnknown(parsed, ["app","version","exportedAt","chairs"], "保存データ", message => issues.push(message));
+  if (issues.length || skipped) {
+    recoveryRaw = raw; keepRaw(raw);
+    loadNotes = "読み込み時の補正・除外 " + issues.length + "か所。 " + issueSummary(issues);
+  }
+  chairs = mergeImport([], usable).next;
+}
+function issueSummary(issues){
+  return issues.slice(0, 8).join("／") + (issues.length > 8 ? " ほか" + (issues.length - 8) + "か所" : "");
+}
+let commitError = "";
+async function commit(next, base = chairs){
+  commitError = "";
+  const write = () => {
+    if (base !== chairs) return { ok:false, error:"conflict" };
+    if (!storageOk) return { ok:false, error:"storage" };
+    const before = localStorage.getItem(STORAGE_KEY);
+    if (before !== storedRaw) return { ok:false, error:"conflict" };
+    if (recoveryRaw !== null && !keepRaw(recoveryRaw)) return { ok:false, error:"recovery" };
+    const json = JSON.stringify(next);
+    // setItemは失敗時に元の値を保持する。他タブの値を巻き戻さない。
+    localStorage.setItem(STORAGE_KEY, json);
+    if (localStorage.getItem(STORAGE_KEY) !== json) return { ok:false, error:"conflict" };
+    storedRaw = json; recoveryRaw = null; loadNotes = ""; chairs = next;
+    return { ok:true };
+  };
+  let res;
+  try { res = navigator.locks ? await navigator.locks.request(STORAGE_KEY, write) : write(); }
+  catch(e) { res = { ok:false, error:"storage" }; }
+  if (res.error === "conflict") { load(); renderList(); renderAlerts(); }
+  commitError = res.error || "";
+  return res;
+}
+function saveError(error = commitError){
+  if (error === "conflict") return "確認中に記録が更新されました。最新の記録を確認してから操作をやり直してください。";
+  if (error === "recovery") return "読み込めなかった元データを別枠に退避できないため、保存を中止しました。ページ上部から元データをダウンロードできます。";
+  return "端末に保存できませんでした。ブラウザの保存設定と空き容量を確認してください。";
+}
+function failToast(){ showToast(saveError(), true, 9000); }
+function loadPrefs(){ try { prefs = JSON.parse(localStorage.getItem(PREF_KEY) || "{}") || {}; } catch(e){ prefs = {}; } }
+function savePrefs(){ try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch(e){} }
+
+/* Toast（action指定で「元に戻す」等のボタン付き） */
+let toastTimer = null;
+function showToast(msg, isError = false, ms = 2600, action = null){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = isError ? "show err" : "show";
+  t.setAttribute("role", isError ? "alert" : "status");
+  if (action) {
+    const b = document.createElement("button");
+    b.type = "button"; b.className = "toast-act"; b.textContent = action.label;
+    b.onclick = () => { clearTimeout(toastTimer); t.className = ""; action.fn(); };
+    t.appendChild(b); t.classList.add("act"); ms = Math.max(ms, 8000);
+  }
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.className = ""; }, ms);
+}
+
+/* Confirm modal (Promise)。opts.phrase を指定すると、その文字を入力しないと実行できない。 */
+let modalResolve = null, modalOpener = null;
+function confirmDialog(title, text, okLabel = "実行する", opts = {}){
+  return new Promise(resolve => {
+    if (modalResolve) modalResolve(false);
+    modalResolve = resolve; modalOpener = document.activeElement;
+    const ph = document.getElementById("modalPhrase"), ok = document.getElementById("modalOk");
+    document.getElementById("modalTitle").textContent = title;
+    document.getElementById("modalText").textContent = text;
+    ok.textContent = okLabel;
+    $("modalCancel").textContent = opts.cancelLabel || "キャンセル";
+    if (opts.phrase) { ph.classList.remove("hidden"); ph.value = ""; ph.placeholder = "「" + opts.phrase + "」と入力"; ok.disabled = true; ph.oninput = () => { ok.disabled = ph.value.trim() !== opts.phrase; }; }
+    else { ph.classList.add("hidden"); ok.disabled = false; }
+    document.getElementById("modalBack").classList.add("show");
+    updateModalState();
+    (opts.phrase ? ph : document.getElementById("modalCancel")).focus();
+  });
+}
+function updateModalState(){
+  const modal = $("modalBack").classList.contains("show");
+  const sheet = !$("formSection").classList.contains("hidden");
+  document.querySelector(".wrap").inert = modal || sheet;
+  $("btnFab").inert = modal || sheet;
+  $("tray").inert = modal || sheet;
+  $("formSection").inert = modal;
+  document.body.classList.toggle("lock", sheet || modal);
+}
+function closeModal(result){
+  document.getElementById("modalBack").classList.remove("show");
+  const r = modalResolve; modalResolve = null;
+  updateModalState();
+  if (modalOpener && document.contains(modalOpener)) modalOpener.focus({ preventScroll:true });
+  else if (!$("formSection").classList.contains("hidden")) $("btnCloseTop").focus({ preventScroll:true });
+  else $("searchInput").focus({ preventScroll:true });
+  if (r) r(result);
+}
+</script>
+<script>
+"use strict";
+/* ---------- Rendering ---------- */
+const $ = (id) => document.getElementById(id);
+
+function sortedChairs(list, modeOverride){
+const mode = modeOverride || $("sortSelect").value;
+const withScore = list.map(ch => ({ ch, s: computeScores(ch.ratings)}));
+const byRecent = (a,b) => (b.ch.updatedAt || "").localeCompare(a.ch.updatedAt || "") || (b.ch.createdAt || "").localeCompare(a.ch.createdAt || "") || a.ch.name.localeCompare(b.ch.name, "ja");
+const scoreOr = (v) => (v === null? -1: v);
+let cmp;
+if (mode === "price") {
+cmp = (a,b) => {
+const pa = a.ch.price === null? Infinity: a.ch.price;
+const pb = b.ch.price === null? Infinity: b.ch.price;
+if (pa!== pb) return pa - pb;
+if (scoreOr(b.s.total)!== scoreOr(a.s.total)) return scoreOr(b.s.total) - scoreOr(a.s.total);
+return byRecent(a,b);
+};
+} else if (mode === "recent") {
+cmp = byRecent;
+} else if (mode === "comfort") {
+cmp = (a,b) =>
+(scoreOr(b.s.comfort) - scoreOr(a.s.comfort)) ||
+(scoreOr(b.s.total) - scoreOr(a.s.total)) ||
+(b.s.coverage - a.s.coverage) || byRecent(a,b);
+} else { /* total */
+cmp = (a,b) =>
+(scoreOr(b.s.total) - scoreOr(a.s.total)) ||
+(scoreOr(b.s.comfort) - scoreOr(a.s.comfort)) ||
+(b.s.coverage - a.s.coverage) || byRecent(a,b);
+}
+return withScore.sort(cmp);
+}
+
+function filteredChairs(){
+const q = norm($("searchInput").value);
+const fs = $("filterSeat").value, ff = $("filterFeat").value;
+const fv = $("filterVerdict").value;
+const budgetOnly = $("filterBudget").checked;
+return chairs.filter(ch => {
+if (fv === "none"? ch.verdict!== "": (fv && ch.verdict!== fv)) return false;
+if (fs && ch.seatType!== fs) return false;
+if (ff) { const st = featureStats(ch); if (ff === "highDone" && st.highKnown < st.highTotal) return false; if (ff === "highPending" && st.highKnown >= st.highTotal) return false; if (ff === "headrest" && ch.features.headrest!== "present") return false; }
+if (budgetOnly &&!(ch.price!== null && ch.price <= BUDGET)) return false;
+if (q) {
+const hay = norm([ch.name, ch.maker, ch.store, ch.good, ch.bad, ch.memo, VERDICT_LABELS[ch.verdict], SEAT_LABELS[ch.seatType], ch.featureMemo, ch.fitMemo, ch.customFeatures].join(" "));
+if (!q.split(" ").every(t => hay.includes(t))) return false;
+}
+return true;
+});
+}
+
+function renderStats(){
+const el = $("stats");
+if (!chairs.length) {
+el.innerHTML =
+'<div class="stat"><div class="num">0<small> 件</small></div><div class="lbl">記録したチェア</div></div>' +
+'<div class="stat"><div class="num">—</div><div class="lbl">最高の総合スコア</div></div>' +
+'<div class="stat"><div class="num">0<small> 件</small></div><div class="lbl">有力候補</div></div>' +
+'<div class="stat"><div class="num">—</div><div class="lbl">予算内で最高スコア</div></div>';
+return;
+}
+const scored = chairs.map(ch => ({ ch, s: computeScores(ch.ratings)})).filter(x => x.s.total!== null);
+const best = scored.length? scored.reduce((a,b)=> b.s.total > a.s.total? b: a): null;
+const candidates = chairs.filter(ch => ch.verdict === "candidate").length;
+const inBudget = scored.filter(x => x.ch.price!== null && x.ch.price <= BUDGET);
+const bestBudget = inBudget.length? inBudget.reduce((a,b)=> b.s.total > a.s.total? b: a): null;
+el.innerHTML =
+'<div class="stat"><div class="num">' + chairs.length + '<small> 件</small></div><div class="lbl">記録したチェア</div></div>' +
+'<div class="stat"><div class="num">' + (best? best.s.total.toFixed(1): "—") + (best? '<small> 点</small>': "") + '</div><div class="lbl">最高の総合スコア' + (best? (best.s.coverage < 1? "（暫定）": "") + "：" + esc(best.ch.name): "") + '</div></div>' +
+'<div class="stat"><div class="num">' + candidates + '<small> 件</small></div><div class="lbl">有力候補</div></div>' +
+'<div class="stat"><div class="num">' + (bestBudget? bestBudget.s.total.toFixed(1): "—") + (bestBudget? '<small> 点</small>': "") + '</div><div class="lbl">予算内（10万円以下）で最高' + (bestBudget? (bestBudget.s.coverage < 1? "（暫定）": "") + "：" + esc(bestBudget.ch.name): "") + '</div></div>';
+}
+
+function scoreBlock(ch, s){
+  if (s.total === null) {
+    return '<div class="scorebox"><div class="score-big">—</div><div class="score-meta">まだ評価がありません。<br>編集から評価を入れるとスコアが出ます。</div></div>';
+  }
+  const lv = levelOf(s), cp = costPerf(ch, s);
+  const cls = lv === "final" ? "badge-candidate" : lv === "prov" ? "badge-hold" : "badge-exclude";
+  const prov = lv === "final" ? "" : " prov";
+  return '<div class="scorepair">' +
+    '<div><div class="sp-l">総合スコア' + (lv === "final" ? "" : "（暫定）") + '</div><div class="score-big">' + s.total.toFixed(1) + '<small> /100</small></div></div>' +
+    '<div><div class="sp-l">座り心地' + (s.comfortCoverage < 1 && s.comfort !== null ? "（暫定）" : "") + '</div><div class="score-big sub">' + (s.comfort !== null ? s.comfort.toFixed(1) : "—") + '<small> /100</small></div></div></div>' +
+    '<div class="badges" style="margin:0 0 10px"><span class="badge ' + cls + '">' + esc(levelLabel(s)) + '</span><span class="badge">評価済み ' + Math.round(s.coverage * 100) + '%</span></div>' +
+    '<div class="bar' + prov + '" role="img" aria-label="総合スコア ' + s.total.toFixed(1) + '点"><i style="width:' + s.total + '%"></i></div>' +
+    (s.comfort !== null ? '<div class="bar comfort' + prov + '" style="margin-top:6px" role="img" aria-label="座り心地スコア ' + s.comfort.toFixed(1) + '点"><i style="width:' + s.comfort + '%"></i></div>' : '') +
+    (cp !== null ? '<div class="meta-line">コスパ <b>' + cp.toFixed(1) + '</b>（スコア／1万円' + (lv === "final" ? "" : "・暫定") + '）</div>' : '');
+}
+
+function miniRatings(ch){
+return '<div class="mini-ratings">' + CRITERIA.map(c => {
+const v = ch.ratings[c.key];
+return '<div class="mini"><span class="mlabel">' + esc(c.label) + '</span>' +
+'<span class="bar"><i style="width:' + (v? v * 20: 0) + '%"></i></span>' +
+'<span class="mval">' + (v? v: "—") + '</span></div>';
+}).join("") + '</div>';
+}
+
+function renderList(){
+for (const id of [...compareIds]) if (!chairs.some(c => c.id === id)) compareIds.delete(id);
+renderStats();
+const list = sortedChairs(filteredChairs());
+const box = $("chairList");
+$("listCount").textContent = chairs.length
+? ("全" + chairs.length + "件中 " + list.length + "件を表示 ・ " + $("sortSelect").selectedOptions[0].textContent)
+: "";
+if (!chairs.length) {
+box.innerHTML = '<div class="empty"><div class="big">🪑</div><p><b style="color:var(--text)">まだ記録がありません</b></p>' +
+'<p>店頭で最初の一脚を試したら「＋ 新規登録」から記録してみてください。<br>試しに使ってみたい場合は、下の「データ管理」からサンプルデータを追加できます。</p></div>';
+renderCompare();
+return;
+}
+if (!list.length) {
+box.innerHTML = '<div class="empty"><p><b style="color:var(--text)">条件に合う記録がありません</b></p><p>検索や絞り込みを変えてみてください。</p></div>';
+renderCompare();
+return;
+}
+const mode0 = $("sortSelect").value;
+const topId = (mode0 === "total" || mode0 === "comfort") && list[0].s.total !== null && (mode0 === "total" || list[0].s.comfort !== null)? list[0].ch.id: null;
+box.innerHTML = '<div class="grid">' + list.map(({ ch, s}, idx) => {
+const priceBadge = ch.price === null? "":
+(ch.price <= BUDGET? '<span class="badge badge-budget">予算内</span>': '<span class="badge badge-over">予算超過</span>');
+const verdictBadge = ch.verdict? '<span class="badge badge-' + ch.verdict + '">' + VERDICT_LABELS[ch.verdict] + '</span>': '<span class="badge">未判定</span>';
+const meta = [
+ch.store? "店舗：<b>" + esc(ch.store) + "</b>": "",
+ch.date? "試座日：<b>" + esc(ch.date) + "</b>": "",
+ch.duration!== null? "試座：<b>" + ch.duration + "分</b>": "",
+"記録：<b>" + fmtDate(ch.updatedAt) + "</b>"
+].filter(Boolean).join(" ・ ");
+return '<article class="card' + (ch.id === topId? " top-pick": "") + '" data-id="' + esc(ch.id) + '">' +
+'<div class="card-head"><div>' +
+(ch.maker? '<div class="maker">' + esc(ch.maker) + '</div>': "") +
+'<h3>' + esc(ch.name) + '</h3>' +
+'<div class="badges">' +
+(ch.id === topId? '<span class="badge badge-rank">' + (s.coverage < 1? "暫定": "") + (mode0 === "comfort"? "座り心地": "総合") + '1位</span>': "") +
+verdictBadge + priceBadge +
+'<span class="badge">' + esc(SEAT_LABELS[ch.seatType]) + '</span>' +
+'</div>' +
+'</div><div style="text-align:right;flex:0 0 auto"><div style="font-size:19px;font-weight:800">' + fmtPrice(ch.price) + '</div><div style="font-size:12px;color:var(--muted)">税込</div></div></div>' +
+scoreBlock(ch, s) +
+miniRatings(ch) + featureSummary(ch) +
+'<div class="meta-line">' + meta + '</div>' +
+((ch.good || ch.bad)? '<div class="goodbad">' + (ch.good? '<p class="g">' + esc(ch.good) + '</p>': "") + (ch.bad? '<p class="b">' + esc(ch.bad) + '</p>': "") + '</div>': "") +
+(ch.memo? '<div class="meta-line">メモ：' + esc(ch.memo) + '</div>': "") +
+'<div class="card-actions">' +
+'<button class="btn btn-small" type="button" data-act="edit">編集</button>' +
+'<button class="btn btn-small" type="button" data-act="dup">複製</button>' +
+'<button class="btn btn-small btn-danger" type="button" data-act="del">削除</button>' +
+'<label class="checkline compare-check"><input type="checkbox" data-act="compare" ' + (compareIds.has(ch.id)? "checked": "") + '> 比較</label>' +
+'</div>' +
+'</article>';
+}).join("") + '</div>';
+renderCompare();
+}
+
+/* ---------- Compare ---------- */
+function compareChairs(){ return chairs.filter(ch => compareIds.has(ch.id));}
+
+function renderCompare(){
+renderTray();
+const sel = compareChairs();
+const sec = $("compareSection");
+if (sel.length < 2) { sec.classList.add("hidden"); return;}
+sec.classList.remove("hidden");
+const data = sel.map(ch => ({ ch, s: computeScores(ch.ratings)}));
+const row = (label, get, winVal) => {
+return "<tr><th scope='row' class='rowlabel'>" + esc(label) + "</th>" + data.map(({ ch, s}) => {
+const v = get(ch, s);
+const isWin = winVal!== null && winVal!== undefined && v.raw!== null && v.raw!== undefined && v.raw === winVal;
+return "<td class='" + (isWin? "win": "") + "'>" + v.html + "</td>";
+}).join("") + "</tr>";
+};
+const maxOf = (fn) => { const vals = data.map(x => fn(x.ch, x.s)).filter(v => v!== null && v!== undefined); return vals.length? Math.max(...vals): null;};
+const minPrice = (() => { const vals = data.map(x => x.ch.price).filter(v => v!== null); return vals.length? Math.min(...vals): null;})();
+let html = "<tr><th scope='col' class='rowlabel'>項目</th>" + data.map(({ ch}) => "<th scope='col'>" + (ch.maker? esc(ch.maker) + "<br>": "") + esc(ch.name) + "</th>").join("") + "</tr>";
+html += row("総合スコア", (ch,s)=>({ raw:s.total, html: s.total === null? "—": "<b>" + s.total.toFixed(1) + "点</b>" + (s.coverage < 1? "（暫定）": "")}), maxOf((ch,s)=>s.total));
+html += row("座り心地スコア", (ch,s)=>({ raw:s.comfort, html: s.comfort === null? "—": "<b>" + s.comfort.toFixed(1) + "点</b>"}), maxOf((ch,s)=>s.comfort));
+html += row("評価済み割合", (ch,s)=>({ raw: Math.round(s.coverage*100), html: Math.round(s.coverage*100) + "%"}), maxOf((ch,s)=>Math.round(s.coverage*100)));
+html += "<tr><th scope='row' class='rowlabel'>税込価格</th>" + data.map(({ ch}) => "<td class='" + (ch.price!== null && ch.price === minPrice? "win": "") + "'>" + fmtPrice(ch.price) + (ch.price!== null? (ch.price <= BUDGET? "（予算内）": "（予算超過）"): "") + "</td>").join("") + "</tr>";
+html += row("評価の確度", (ch,s)=>({ raw:null, html: esc(levelLabel(s))}), null);
+html += row("予算（10万円）との差", (ch)=>({ raw: ch.price === null ? null : BUDGET - ch.price, html: ch.price === null ? "—" : (ch.price <= BUDGET ? "あと" + fmtPrice(BUDGET - ch.price) : "超過 " + fmtPrice(ch.price - BUDGET))}), maxOf((ch)=>ch.price === null ? null : BUDGET - ch.price));
+html += row("コスパ（点／1万円）", (ch,s)=>{ const cp = costPerf(ch,s); return { raw: cp === null ? null : Math.round(cp*10)/10, html: cp === null ? "—" : cp.toFixed(1) + (s.coverage < 1 ? "（暫定）" : "")}; }, maxOf((ch,s)=>{ const cp = costPerf(ch,s); return cp === null ? null : Math.round(cp*10)/10; }));
+html += row("候補判定", (ch)=>({ raw:null, html: esc(VERDICT_LABELS[ch.verdict])}), null);
+html += row("座面タイプ", (ch)=>({ raw:null, html: esc(SEAT_LABELS[ch.seatType])}), null);
+html += row("試座店舗／日", (ch)=>({ raw:null, html: esc([ch.store, ch.date].filter(Boolean).join(" ・ ") || "—")}), null);
+for (const c of CRITERIA) {
+html += row(c.label + "（" + c.weight + "%）", (ch)=>({ raw: ch.ratings[c.key], html: ch.ratings[c.key]? ch.ratings[c.key] + "点（" + SCORE_LABELS[ch.ratings[c.key]] + "）": "未評価"}), maxOf((ch)=>ch.ratings[c.key]));
+}
+html += compareExtra(data);
+html += row("良かった点", (ch)=>({ raw:null, html: esc(ch.good || "—")}), null);
+html += row("気になった点", (ch)=>({ raw:null, html: esc(ch.bad || "—")}), null);
+html += row("メモ", (ch)=>({ raw:null, html: esc(ch.memo || "—")}), null);
+$("compareTable").style.setProperty("--compare-width", (145 + 175 * data.length) + "px");
+$("compareTable").innerHTML = html;
+
+$("compareBars").innerHTML = CRITERIA.map(c => {
+return '<div class="cmp-item"><div class="cmp-title">' + esc(c.label) + ' <span style="color:var(--muted);font-weight:600">' + c.weight + '%</span></div>' +
+data.map(({ ch}) => {
+const v = ch.ratings[c.key];
+return '<div class="cmp-line"><span class="nm">' + esc(ch.name) + '</span><span class="bar"><i style="width:' + (v? v*20: 0) + '%"></i></span><span class="vl">' + (v?? "—") + '</span></div>';
+}).join("") + "</div>";
+}).join("");
+}
+
+function buildSummaryText(list, detail, omitUnknown = false){
+  const sorted = sortedChairs(list.slice(), "total");
+  const lines = ["チェア試座ノート 比較結果（総合スコア順）" + (detail ? "［詳細］" : ""), "出力日：" + todayStr(), ""];
+  if (detail && omitUnknown) lines.push("※ 詳細欄では未確認の機能・フィット感を省略しています。", "");
+  if (!sorted.length) { lines.push("記録はまだありません。"); return lines.join("\n"); }
+  sorted.forEach(({ ch, s }, i) => {
+    lines.push((i+1) + "位　" + (ch.maker ? ch.maker + " " : "") + ch.name);
+    lines.push("　総合スコア：" + (s.total === null ? "未評価" : s.total.toFixed(1) + "点" + (s.coverage < 1 ? "（暫定）" : "")) +
+      "／座り心地：" + (s.comfort === null ? "—" : s.comfort.toFixed(1) + "点") + "／評価済み：" + Math.round(s.coverage*100) + "%");
+    lines.push("　価格：" + fmtPrice(ch.price) + "（税込）／判定：" + VERDICT_LABELS[ch.verdict] + "／" + SEAT_LABELS[ch.seatType]);
+    if (ch.store || ch.date) lines.push("　試座：" + [ch.store, ch.date].filter(Boolean).join(" ・ ") + (ch.duration !== null ? " ・ " + ch.duration + "分" : ""));
+    lines.push("　評価：" + CRITERIA.map(c => c.label.replace("・姿勢の安定性","") + ":" + (ch.ratings[c.key] ?? "未")).join(" "));
+    const st = featureStats(ch);
+    lines.push("　搭載機能：確認済み " + st.known + "/" + st.total + "（搭載" + st.present + "・非搭載" + st.absent + "・未確認" + st.unknown + "）");
+    const pres = FEATURES.filter(d => ch.features[d.key] === "present").map(d => d.label);
+    if (pres.length) lines.push("　主な搭載機能：" + pres.slice(0, 8).join("、") + (pres.length > 8 ? " ほか" + (pres.length - 8) + "件" : ""));
+    const opts = FEATURES.filter(d => ch.features[d.key] === "present" && ch.featureOptions[d.key] === "optional").map(d => d.label);
+    if (opts.length) lines.push("　オプション装備：" + opts.join("、"));
+    if (!detail || !omitUnknown) lines.push("　フィット感：" + FIT_ITEMS.map(f => f.short + "＝" + FIT_LABELS[ch.fit[f.key]]).join("、"));
+    const sp = SPEC_DEFS.filter(d => ch.specs[d.key] !== null).map(d => d.label + " " + ch.specs[d.key] + d.unit);
+    if (sp.length) lines.push("　仕様：" + sp.join("／"));
+    if (detail) {
+      for (const c of FEAT_CATS) {
+        const items = FEATURES.filter(f => f.cat === c && (!omitUnknown || ch.features[f.key] !== "unknown"));
+        if (!items.length) continue;
+        lines.push("　［" + c + "］");
+        for (const d of items) lines.push("　　" + d.label + "：" + featureText(ch, d.key));
+      }
+      for (const f of FIT_ITEMS) if (!omitUnknown || ch.fit[f.key] !== "unknown") lines.push("　フィット／" + f.label + "：" + FIT_LABELS[ch.fit[f.key]]);
+      lines.push("　未確認は「非搭載」ではありません。搭載機能・フィット感は点数に影響しません。");
+    }
+    if (ch.featureMemo) lines.push("　機能メモ：" + ch.featureMemo);
+    if (ch.fitMemo) lines.push("　フィット感メモ：" + ch.fitMemo);
+    if (ch.customFeatures) lines.push("　その他・独自の機能：" + ch.customFeatures);
+    if (ch.good) lines.push("　良かった点：" + ch.good);
+    if (ch.bad) lines.push("　気になった点：" + ch.bad);
+    if (ch.memo) lines.push("　メモ：" + ch.memo);
+    lines.push("");
+  });
+  return lines.join("\n");
+}
+
+async function copyText(text, okMsg){
+  try { await navigator.clipboard.writeText(text); showToast(okMsg); return; }
+  catch(e) { /* ファイルを開く環境によってClipboard APIが使えない */ }
+  const opener = document.activeElement;
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  const root = $("formSection").classList.contains("hidden") ? document.body : $("formSection");
+  root.appendChild(ta); ta.select();
+  let copied = false;
+  try { copied = document.execCommand("copy"); } catch(e) {}
+  ta.remove();
+  opener?.focus({ preventScroll:true });
+  if (copied) showToast(okMsg);
+  else showToast("コピーできませんでした。記録はJSONからも書き出せます。", true);
+}
+</script>
+<script>
+"use strict";
+/* ---------- Form & ratings ---------- */
+function buildStoreChips(){
+  $("storeChips").innerHTML = STORE_PRESETS.map(s =>
+    '<button type="button" data-store="' + esc(s) + '">' + esc(s) + '</button>').join("");
+  $("storeChips").querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => { $("f-store").value = btn.dataset.store; markDirty(); });
+  });
+}
+
+/* ---------- v3: 搭載機能・フィット感 UI ---------- */
+let formFeatures = emptyFeatures(), formFeatureOpts = {}, formFit = emptyFit();
+const cmpOpen = { feat:true, fit:true, spec:true, memo:false };
+function buildFeatureRows(){
+  const box = $("featRows");
+  box.innerHTML = FEAT_CATS.map(cat => '<details class="fcat" open data-cat="' + esc(cat) + '"><summary>' + esc(cat) + ' <span class="cnt" data-cnt></span></summary>' +
+    FEATURES.filter(f => f.cat === cat).map(f =>
+      '<div class="frow" data-fkey="' + f.key + '" data-pri="' + f.pri + '"><div class="fname">' + esc(f.label) + (f.pri === "high" ? '<span class="pri">重要</span>' : '') + '</div><div class="fhint">' + esc(f.hint) + '</div>' +
+      '<div class="tri" role="group" aria-label="' + esc(f.label) + 'の搭載状況">' + [["unknown","未確認"],["present","搭載"],["absent","非搭載"]].map(([v, l]) => '<button type="button" data-fk="' + f.key + '" data-fv="' + v + '" aria-pressed="false">' + l + '</button>').join("") + '</div>' +
+      '<div class="topt hidden" role="group" aria-label="' + esc(f.label) + 'の装備区分"><span>区分</span>' + [["standard","標準"],["optional","追加オプション"],["unknown","不明"]].map(([v, l]) => '<button type="button" data-ok="' + f.key + '" data-ov="' + v + '" aria-pressed="false">' + l + '</button>').join("") + '</div></div>').join("") + '</details>').join("");
+  box.addEventListener("click", (ev) => {
+    const a = ev.target.closest("button[data-fk]"); if (a) { setFeature(a.dataset.fk, a.dataset.fv); return; }
+    const o = ev.target.closest("button[data-ok]"); if (o) setOpt(o.dataset.ok, o.dataset.ov);
+  });
+}
+function buildFitRows(){
+  const box = $("fitRows");
+  box.innerHTML = FIT_ITEMS.map(f => '<div class="frow" data-tkey="' + f.key + '"><div class="fname">' + esc(f.label) + '</div><div class="fhint">' + esc(f.hint) + '</div>' +
+    '<div class="tri four" role="group" aria-label="' + esc(f.label) + 'のフィット感">' + [["unknown","未確認"],["good","合う"],["mixed","微妙"],["bad","合わない"]].map(([v, l]) => '<button type="button" data-tk="' + f.key + '" data-tv="' + v + '" aria-pressed="false">' + l + '</button>').join("") + '</div>' +
+    '<div class="fnote hidden" data-note>関連機能が非搭載のため、対象機能なしの可能性があります（入力済みの内容は消しません）。</div></div>').join("");
+  box.addEventListener("click", (ev) => { const b = ev.target.closest("button[data-tk]"); if (b) setFit(b.dataset.tk, b.dataset.tv); });
+}
+let activeUnknownFeature = null;
+function setFeature(k, v){
+  activeUnknownFeature = v === "present" && $("featOnlyUnknown").checked ? k : null;
+  if (v === "absent" && $("featOnlyUnknown").checked) $("featOnlyUnknown").focus({ preventScroll:true });
+  formFeatures[k] = v;
+  if (v === "present") { if (!formFeatureOpts[k]) formFeatureOpts[k] = "unknown"; } else delete formFeatureOpts[k];
+  markDirty(); refreshFeatureUI(); refreshFitUI();
+}
+function setOpt(k, v){
+  if (formFeatures[k] !== "present") return;
+  formFeatureOpts[k] = v;
+  if (activeUnknownFeature === k) { activeUnknownFeature = null; $("featOnlyUnknown").focus({ preventScroll:true }); }
+  markDirty(); refreshFeatureUI();
+}
+function setFit(k, v){ formFit[k] = v; markDirty(); refreshFitUI(); }
+function warnHtml(list){ return list.length ? '<div class="alert warn" role="status"><b>確認してください（このまま保存もできます）</b><br>' + list.map(esc).join("<br>") + '</div>' : ""; }
+function refreshFeatureUI(){
+  const key = !prefs.featAll, onlyUnk = $("featOnlyUnknown").checked;
+  document.querySelectorAll("#featRows .frow").forEach(row => {
+    const k = row.dataset.fkey, v = formFeatures[k];
+    row.querySelectorAll("button[data-fk]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.fv === v)));
+    const opt = row.querySelector(".topt"); opt.classList.toggle("hidden", v !== "present");
+    if (v === "present") opt.querySelectorAll("button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.ov === (formFeatureOpts[k] || "unknown"))));
+    row.hidden = (key && row.dataset.pri !== "high") || (onlyUnk && v !== "unknown" && activeUnknownFeature !== k);
+  });
+  document.querySelectorAll("#featRows .fcat").forEach(d => {
+    const rows = [...d.querySelectorAll(".frow")];
+    d.querySelector("[data-cnt]").textContent = rows.filter(r => formFeatures[r.dataset.fkey] !== "unknown").length + "/" + rows.length + "確認";
+    d.hidden = !rows.some(r => !r.hidden);
+  });
+  $("featModeKey").setAttribute("aria-pressed", String(key)); $("featModeAll").setAttribute("aria-pressed", String(!key));
+  $("featProg").textContent = "確認済み " + FEATURES.filter(f => formFeatures[f.key] !== "unknown").length + "/" + FEATURES.length;
+  $("featWarn").innerHTML = warnHtml(featureWarnings(formFeatures, formFit).feat);
+}
+function refreshFitUI(){
+  FIT_ITEMS.forEach(f => {
+    const row = document.querySelector('#fitRows [data-tkey="' + f.key + '"]'); if (!row) return;
+    row.querySelectorAll("button[data-tk]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.tv === formFit[f.key])));
+    row.querySelector("[data-note]").classList.toggle("hidden", !(fitNoTarget(formFeatures, f)));
+  });
+  $("fitProg").textContent = "確認済み " + FIT_ITEMS.filter(f => formFit[f.key] !== "unknown").length + "/" + FIT_ITEMS.length;
+  $("fitWarn").innerHTML = warnHtml(featureWarnings(formFeatures, formFit).fit);
+}
+
+/* 一覧カード用の要約（24項目は常時表示しない） */
+function featureSummary(ch){
+  const st = featureStats(ch), ft = fitStats(ch);
+  const main = FEATURES.filter(d => d.pri === "high" && ch.features[d.key] === "present").map(d => d.label);
+  let h = '<div class="meta-line fsum">搭載機能：確認済み <b>' + st.known + '/' + st.total + '</b>（搭載 ' + st.present + '）' +
+    (main.length ? '<br>主な搭載：' + esc(main.slice(0, 3).join("、")) + (main.length > 3 ? ' ほか' + (main.length - 3) + '件' : '') : '') +
+    '<br>フィット感：合う ' + ft.good + '／微妙 ' + ft.mixed + '／合わない ' + ft.bad + '／未確認 ' + ft.unknown + '</div>';
+  const grp = (label, arr) => arr.length ? '<div class="fgrp"><b>' + label + '</b>：' + esc(arr.join("、")) + '</div>' : '';
+  const pres = FEATURES.filter(d => ch.features[d.key] === "present").map(d => d.label + (ch.featureOptions[d.key] === "standard" ? "（標準）" : ch.featureOptions[d.key] === "optional" ? "（オプション）" : ""));
+  const abs = FEATURES.filter(d => ch.features[d.key] === "absent").map(d => d.label);
+  const sp = SPEC_DEFS.filter(d => ch.specs[d.key] !== null).map(d => d.label + " " + ch.specs[d.key] + d.unit);
+  const fit = FIT_ITEMS.map(i => i.short + "＝" + FIT_LABELS[ch.fit[i.key]]).join("、");
+  h += '<details class="fdet"><summary>機能を見る</summary>' + grp("搭載", pres) + grp("非搭載", abs) +
+    '<div class="fgrp">未確認：' + st.unknown + '項目（搭載機能の数は点数に影響せず、品質の高さも意味しません）</div>' +
+    '<div class="fgrp"><b>フィット感</b>：' + esc(fit) + '</div>' + grp("仕様", sp) +
+    (ch.featureMemo ? '<div class="fgrp"><b>機能メモ</b>：' + esc(ch.featureMemo) + '</div>' : '') +
+    (ch.fitMemo ? '<div class="fgrp"><b>フィット感メモ</b>：' + esc(ch.fitMemo) + '</div>' : '') +
+    (ch.customFeatures ? '<div class="fgrp"><b>その他・独自の機能</b>：' + esc(ch.customFeatures) + '</div>' : '') + '</details>';
+  return h;
+}
+
+/* 比較表の追加セクション（機能数による勝者表示はしない／未確認は空欄にしない） */
+function compareExtra(data){
+  const n = data.length;
+  const head = (id, label) => '<tr><td class="secrow" colspan="' + (n + 1) + '"><button type="button" class="btn btn-small" data-sec="' + id + '" aria-expanded="' + cmpOpen[id] + '">' + (cmpOpen[id] ? "▼ " : "▶ ") + label + '</button></td></tr>';
+  const rowH = (label, fn) => "<tr><th scope='row' class='rowlabel'>" + esc(label) + "</th>" + data.map(({ ch, s }) => "<td>" + fn(ch, s) + "</td>").join("") + "</tr>";
+  const cat = (name) => '<tr><td class="catrow" colspan="' + (n + 1) + '">' + esc(name) + '</td></tr>';
+  const fcell = (ch, k) => { const v = ch.features[k]; return '<span class="' + (v === "present" ? "f-p\">◎ " : v === "absent" ? "f-a\">× " : "f-u\">？ ") + esc(featureText(ch, k)) + '</span>'; };
+  const mark = { good:"◯ ", mixed:"△ ", bad:"× ", unknown:"？ " };
+  let h = head("feat", "搭載機能（仕様の記録。点数には加算されません）");
+  if (cmpOpen.feat) {
+    h += rowH("確認済み", ch => { const st = featureStats(ch); return "<b>" + st.known + "/" + st.total + "</b><br><small>搭載" + st.present + "・非搭載" + st.absent + "・未確認" + st.unknown + "</small>"; });
+    for (const c of FEAT_CATS) { h += cat(c); for (const d of FEATURES.filter(f => f.cat === c)) h += rowH(d.label, ch => fcell(ch, d.key)); }
+  }
+  h += head("fit", "体格へのフィット感（参考情報）");
+  if (cmpOpen.fit) for (const i of FIT_ITEMS) h += rowH(i.label, ch => '<span class="' + (ch.fit[i.key] === "unknown" ? "f-u" : "") + '">' + mark[ch.fit[i.key]] + FIT_LABELS[ch.fit[i.key]] + '</span>' + (fitNoTarget(ch.features, i) ? '<br><small class="f-u">関連機能が非搭載</small>' : ''));
+  h += head("spec", "仕様の数値");
+  if (cmpOpen.spec) for (const d of SPEC_DEFS) h += rowH(d.label, ch => ch.specs[d.key] === null ? "—" : ch.specs[d.key] + d.unit);
+  h += head("memo", "機能メモ・フィット感メモ・独自の機能");
+  if (cmpOpen.memo) {
+    const m = (v) => v ? '<div class="cmem">' + esc(v) + '</div>' : "—";
+    h += rowH("機能メモ", ch => m(ch.featureMemo)) + rowH("フィット感メモ", ch => m(ch.fitMemo)) + rowH("その他・独自の機能", ch => m(ch.customFeatures));
+  }
+  return h;
+}
+
+/* ---------- Rating UI（ひとつずつ／一覧） ---------- */
+let ratingIdx = 0, advanceTimer = null;
+function isGuided(){ return prefs.guided === undefined ? window.matchMedia("(max-width:700px)").matches : !!prefs.guided; }
+function buildRatingRows(){
+  $("ratingRows").innerHTML = CRITERIA.map(c => {
+    const btns = ['<button type="button" data-key="' + c.key + '" data-val="0" aria-label="' + esc(c.label) + 'を未評価にする">未<small>評価</small></button>']
+      .concat([1,2,3,4,5].map(v => '<button type="button" data-key="' + c.key + '" data-val="' + v + '" aria-label="' + esc(c.label) + 'を' + v + '点にする">' + v + '<small>' + SCORE_LABELS[v] + '</small></button>')).join("");
+    return '<div class="rating-row" data-row="' + c.key + '">' +
+      '<div class="rating-info"><span class="rname">' + esc(c.label) + '<span class="w">重み ' + c.weight + '%</span></span><div class="rhint">' + esc(c.hint) + '</div></div>' +
+      '<div class="rating-current" data-current="' + c.key + '">未評価</div>' +
+      '<div class="rate-btns" role="group" aria-label="' + esc(c.label) + 'の評価">' + btns + '</div></div>';
+  }).join("");
+  $("ratingChips").innerHTML = CRITERIA.map((c, i) => '<button type="button" data-chip="' + i + '" aria-label="' + (i + 1) + '番目 ' + esc(c.label) + 'へ移動">' + (i + 1) + '</button>').join("");
+  $("ratingRows").addEventListener("click", (ev) => { const b = ev.target.closest("button[data-key]"); if (b) setRating(b.dataset.key, Number(b.dataset.val)); });
+  $("ratingChips").addEventListener("click", (ev) => { const b = ev.target.closest("button[data-chip]"); if (b) { clearTimeout(advanceTimer); ratingIdx = Number(b.dataset.chip); refreshRatingUI(); } });
+  $("ratingPrev").addEventListener("click", () => { clearTimeout(advanceTimer); ratingIdx = Math.max(0, ratingIdx - 1); refreshRatingUI(); });
+  $("ratingNext").addEventListener("click", () => { clearTimeout(advanceTimer); ratingIdx = Math.min(CRITERIA.length - 1, ratingIdx + 1); refreshRatingUI(); });
+  $("modeGuided").addEventListener("click", () => { prefs.guided = true; savePrefs(); refreshRatingUI(); });
+  $("modeList").addEventListener("click", () => { prefs.guided = false; savePrefs(); refreshRatingUI(); });
+  refreshRatingUI();
+}
+function setRating(key, val){
+  clearTimeout(advanceTimer);
+  formRatings[key] = (val === 0 || formRatings[key] === val) ? null : val;
+  markDirty(); refreshRatingUI();
+  const i = CRITERIA.findIndex(c => c.key === key);
+  if (isGuided() && formRatings[key] !== null && i === ratingIdx && i < CRITERIA.length - 1) {
+    clearTimeout(advanceTimer);
+    advanceTimer = setTimeout(() => {
+      const wasInRow = document.activeElement?.closest("[data-row]")?.dataset.row === key;
+      ratingIdx = i + 1; refreshRatingUI();
+      if (wasInRow) $("ratingChips").children[ratingIdx].focus({ preventScroll:true });
+    }, 260);
+  }
+}
+function refreshRatingUI(){
+  const g = isGuided(), box = $("ratingRows");
+  box.className = g ? "guided" : "list";
+  CRITERIA.forEach((c, i) => {
+    const v = formRatings[c.key], row = box.querySelector('[data-row="' + c.key + '"]');
+    row.classList.toggle("cur", i === ratingIdx);
+    row.querySelectorAll("button[data-key]").forEach(btn => {
+      const bv = Number(btn.dataset.val);
+      btn.classList.toggle("sel", v !== null && bv === v);
+      btn.classList.toggle("sel-none", v === null && bv === 0);
+      btn.setAttribute("aria-pressed", String((v === null && bv === 0) || bv === v));
+    });
+    row.querySelector("[data-current]").textContent = v === null ? "未評価" : v + "点：" + SCORE_LABELS[v];
+    const chip = $("ratingChips").children[i];
+    chip.classList.toggle("done", v !== null); chip.classList.toggle("cur", g && i === ratingIdx);
+    if (g && i === ratingIdx) chip.setAttribute("aria-current", "step"); else chip.removeAttribute("aria-current");
+  });
+  $("ratingChips").classList.toggle("hidden", !g); $("ratingNav").classList.toggle("hidden", !g);
+  $("ratingPrev").disabled = ratingIdx === 0; $("ratingNext").disabled = ratingIdx === CRITERIA.length - 1;
+  $("ratingCount").textContent = (ratingIdx + 1) + " / " + CRITERIA.length;
+  $("modeGuided").setAttribute("aria-pressed", String(g)); $("modeList").setAttribute("aria-pressed", String(!g));
+  const s = computeScores(formRatings), lv = levelOf(s);
+  $("dockTotal").textContent = s.total === null ? "—" : s.total.toFixed(1);
+  $("dockComfort").textContent = s.comfort === null ? "—" : s.comfort.toFixed(1);
+  $("dockCov").textContent = s.evaluatedCount + "/" + CRITERIA.length + "項目";
+  const st = $("dockState");
+  st.textContent = lv === "none" ? "未評価" : lv === "final" ? "確定" : lv === "prov" ? "暫定" : "参考値";
+  st.className = "badge " + (lv === "final" ? "badge-candidate" : lv === "none" ? "" : lv === "prov" ? "badge-hold" : "badge-exclude");
+  $("ratingProg").textContent = s.evaluatedCount + "/" + CRITERIA.length + " 評価済み";
+}
+
+/* ---------- Form（下書き自動保存・閉じる時の確認） ---------- */
+const FIELDS = { maker:"f-maker", name:"f-name", store:"f-store", date:"f-date", price:"f-price", duration:"f-duration", verdict:"f-verdict", seatType:"f-seatType", good:"f-good", bad:"f-bad", memo:"f-memo", featureMemo:"f-featureMemo", fitMemo:"f-fitMemo", customFeatures:"f-customFeatures", specMax:"f-specMax", specWarranty:"f-specWarranty", specLoad:"f-specLoad" };
+let dirty = false, draftTimer = null, draftWarned = false, formOpener = null;
+function readFields(){ const o = {}; for (const k in FIELDS) o[k] = $(FIELDS[k]).value; return o; }
+function writeFields(o){ for (const k in FIELDS) $(FIELDS[k]).value = o[k] == null ? "" : o[k]; }
+function chairToFields(ch){ return { maker:ch.maker, name:ch.name, store:ch.store, date:ch.date, price: ch.price === null ? "" : ch.price, duration: ch.duration === null ? "" : ch.duration, verdict:ch.verdict, seatType:ch.seatType, good:ch.good, bad:ch.bad, memo:ch.memo, featureMemo:ch.featureMemo, fitMemo:ch.fitMemo, customFeatures:ch.customFeatures, specMax:ch.specs.maxReclineDeg ?? "", specWarranty:ch.specs.warrantyYears ?? "", specLoad:ch.specs.loadCapacityKg ?? "" }; }
+let draftRaw = null, preserveUnreadableDraft = false;
+function readDraft(){
+  const raw = getStored(DRAFT_KEY);
+  try {
+    const d = JSON.parse(raw);
+    return isObj(d) && isObj(d.f) ? { ...d, raw } : null;
+  } catch(e){ return null; }
+}
+function saveDraft(){
+  try {
+    if (preserveUnreadableDraft || localStorage.getItem(DRAFT_KEY) !== draftRaw) throw new Error("draft conflict");
+    const json = JSON.stringify({ editingId, baseUpdated: editingBase, baseRecord: editingRecord, f: readFields(), ratings: { ...formRatings }, features: { ...formFeatures }, featureOptions: { ...formFeatureOpts }, fit: { ...formFit }, at: new Date().toISOString() });
+    localStorage.setItem(DRAFT_KEY, json);
+    draftRaw = json; draftWarned = false;
+    return true;
+  } catch(e){
+    if (!draftWarned) {
+      draftWarned = true;
+      showToast("下書きを端末に残せませんでした。保存設定や、別タブの下書きを確認してください。", true, 5000);
+    }
+    return false;
+  }
+}
+function clearDraft(expected){
+  try {
+    if (localStorage.getItem(DRAFT_KEY) !== expected) return false;
+    localStorage.removeItem(DRAFT_KEY);
+    return true;
+  } catch(e){ return false; }
+}
+function markDirty(){
+  dirty = true;
+  clearTimeout(draftTimer);
+  draftTimer = setTimeout(saveDraft, 300);
+}
+function flushDraft(){ if (dirty) { clearTimeout(draftTimer); return saveDraft(); } return true; }
+function draftMatches(d, ch){
+  return d && d.editingId === (ch ? ch.id : null) &&
+    (!ch || (d.baseUpdated === ch.updatedAt && (!d.baseRecord || d.baseRecord === JSON.stringify(ch))));
+}
+async function startForm(ch){
+  const d = readDraft();
+  if (d && !draftMatches(d, ch)) {
+    const ok = await confirmDialog("別の下書きがあります", "入力途中の記録（" + (d.f.name || "製品名未入力") + "）が残っています。破棄して、こちらを開きますか？", "破棄して開く");
+    if (!ok) return;
+    if (!clearDraft(d.raw)) { showToast("下書きが更新されたか、削除できませんでした。", true); return; }
+  }
+  openForm(ch, true);
+}
+function openForm(ch, useDraft, recover = null){
+  clearTimeout(draftTimer);
+  if ($("formSection").classList.contains("hidden")) formOpener = document.activeElement;
+  draftRaw = getStored(DRAFT_KEY); draftWarned = false;
+  preserveUnreadableDraft = draftRaw !== null && !readDraft();
+  editingRecord = ch ? JSON.stringify(ch) : null;
+  editingId = ch ? ch.id : null; editingBase = ch ? ch.updatedAt : null;
+  formRatings = ch ? { ...ch.ratings } : emptyRatings();
+  formFeatures = ch ? { ...ch.features } : emptyFeatures(); formFeatureOpts = ch ? { ...ch.featureOptions } : {}; formFit = ch ? { ...ch.fit } : emptyFit();
+  writeFields(ch ? chairToFields(ch) : { date: todayStr() });
+  dirty = false;
+  const note = $("draftNote"); note.classList.add("hidden"); note.textContent = "";
+  const d = recover || (useDraft ? readDraft() : null);
+  if (recover || draftMatches(d, ch)) {
+    draftRaw = d.raw;
+    writeFields(d.f);
+    formRatings = emptyRatings(); for (const c of CRITERIA) formRatings[c.key] = toRating(d.ratings && d.ratings[c.key]);
+    const nf = normFeatures(d.features, d.featureOptions); formFeatures = nf.features; formFeatureOpts = nf.featureOptions; formFit = normFit(d.fit);
+    dirty = true;
+    note.textContent = recover ? "別の記録として下書きを復元しました。保存済みの記録はそのままです。 " : "前回の入力途中の内容を復元しました。 ";
+    const b = document.createElement("button"); b.type = "button"; b.className = "btn btn-small"; b.textContent = "破棄して最初から入力";
+    b.onclick = () => { if (clearDraft(draftRaw)) openForm(ch, false); else formError("下書きを破棄できませんでした。", null, true); };
+    note.appendChild(b); note.classList.remove("hidden");
+  }
+  $("formTitle").textContent = ch ? "記録を編集" : "新しいチェアを登録";
+  $("btnSave").textContent = ch ? "変更を保存する" : "保存する";
+  $("formError").classList.remove("show");
+  const firstUnrated = CRITERIA.findIndex(c => formRatings[c.key] === null);
+  ratingIdx = firstUnrated < 0 ? 0 : firstUnrated;
+  activeUnknownFeature = null;
+  refreshRatingUI(); refreshFeatureUI(); refreshFitUI();
+  $("formSection").querySelectorAll(".fsec").forEach((section, i) => { section.open = i < 2; });
+  $("formSection").classList.remove("hidden"); $("formSection").scrollTop = 0;
+  updateModalState();
+  (matchMedia("(pointer:coarse)").matches ? $("btnCloseTop") : (ch ? $("f-name") : $("f-maker"))).focus({ preventScroll:true });
+}
+function closeForm(){
+  $("formSection").classList.add("hidden"); updateModalState();
+  editingId = null; editingBase = null; editingRecord = null; dirty = false; clearTimeout(advanceTimer); clearTimeout(draftTimer);
+  if (formOpener && document.contains(formOpener)) formOpener.focus();
+  else (matchMedia("(max-width:700px)").matches ? $("btnFab") : $("btnNew")).focus({ preventScroll:true });
+  renderAlerts();
+}
+async function requestClose(){
+  if ($("btnSave").disabled) return;
+  if (dirty && !flushDraft()) {
+    formError("下書きを保存できなかったためフォームを開いたままにしています。コピーで入力を控えるか、「保存する」をお試しください。", null, true);
+    if (!await confirmDialog("下書きを保存できません", "閉じると今回の未保存入力は失われます。入力を残すには「キャンセル」を選んでください。", "入力を破棄して閉じる")) return;
+  } else if (dirty && !await confirmDialog("入力を閉じますか？", "入力を下書きとして端末に保存しました。ページ上部の案内から続きを入力できます。", "閉じる")) return;
+  closeForm();
+}
+function formAsText(){ return JSON.stringify({ ...readFields(), ratings: formRatings, features: formFeatures, featureOptions: formFeatureOpts, fit: formFit }, null, 2); }
+function formError(msg, fieldId, withCopy){
+  const e = $("formError"); e.textContent = msg;
+  if (withCopy) { const b = document.createElement("button"); b.type = "button"; b.className = "btn btn-small"; b.style.marginTop = "8px"; b.textContent = "入力内容をテキストでコピー"; b.onclick = () => copyText(formAsText(), "入力内容をコピーしました。"); e.appendChild(document.createElement("br")); e.appendChild(b); }
+  e.classList.add("show");
+  if (fieldId) { const f = $(fieldId), d = f.closest("details"); if (d) d.open = true; f.focus(); } else e.scrollIntoView({ block:"center" });
+}
+
+async function handleSave(ev){
+  ev.preventDefault();
+  if ($("btnSave").disabled) return;
+  $("formError").classList.remove("show");
+  const name = $("f-name").value.trim();
+  if (!name) { formError("製品名を入力してください（必須）。メーカーが分かる場合はメーカー欄へどうぞ。", "f-name"); return; }
+  for (const id of ["f-price","f-duration","f-date",...SPEC_DEFS.map(d => d.field)]) {
+    if ($(id).validity.badInput) { formError("入力形式を確認してください。", id); return; }
+  }
+  const priceRaw = $("f-price").value.trim(), durRaw = $("f-duration").value.trim();
+  const price = priceRaw === "" ? null : Number(priceRaw), duration = durRaw === "" ? null : Number(durRaw);
+  if (price !== null && (!Number.isFinite(price) || price < 0 || price > 99999999)) { formError("価格は0〜99,999,999の数字で入力してください。", "f-price"); return; }
+  if (duration !== null && (!Number.isFinite(duration) || duration < 0 || duration > 1440)) { formError("試座時間は0〜1440分の数字で入力してください。", "f-duration"); return; }
+  const specs = {};
+  for (const d of SPEC_DEFS) {
+    const raw = $(d.field).value.trim();
+    if (raw === "") { specs[d.key] = null; continue; }
+    const n = Number(raw);
+    if (!Number.isFinite(n) || n < d.min || n > d.max) { formError(d.label + "は" + d.min + "〜" + d.max + d.unit + "の数値で入力してください（不明なら空欄のままにします）。", d.field); return; }
+    specs[d.key] = n;
+  }
+  const now = new Date().toISOString();
+  const f = readFields();
+  const old = editingId ? chairs.find(c => c.id === editingId) : null;
+  if (editingId && (!old || JSON.stringify(old) !== editingRecord)) {
+    formError("この記録は編集中に更新または削除されました。閉じてから下書きを新規記録として復元するか、入力をコピーして最新の記録を開いてください。", null, true);
+    return;
+  }
+  if (old) for (const k of ["good","bad","memo","featureMemo","fitMemo","customFeatures"]) {
+    if (f[k] === old[k].replace(/\r\n?/g, "\n")) f[k] = old[k];
+  }
+  const rec = sanitizeChair({ ...(old || { id: uid(), createdAt: now }), ...f, name, price, duration, ratings: { ...formRatings }, features: { ...formFeatures }, featureOptions: { ...formFeatureOpts }, fit: { ...formFit }, specs, updatedAt: now });
+  const next = old ? chairs.map(c => c.id === old.id ? rec : c) : [rec].concat(chairs);
+  $("btnSave").disabled = true;
+  $("chairForm").inert = true;
+  const res = await commit(next);
+  $("chairForm").inert = false;
+  $("btnSave").disabled = false;
+  if (!res.ok) {
+    formError(saveError(res.error) + " 入力内容はこの画面に残っています。", null, true);
+    return;
+  }
+  clearTimeout(draftTimer);
+  if (!preserveUnreadableDraft) clearDraft(draftRaw);
+  dirty = false;
+  closeForm(); renderList();
+  showToast(old ? "記録を更新しました。" : "「" + name + "」を保存しました。");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ---------- Alerts / tray ---------- */
+function backupInfo(){
+  const last = prefs.lastExport || null;
+  const n = chairs.filter(c => !last || Date.parse(c.updatedAt) > Date.parse(last)).length;
+  return { last, n };
+}
+function renderAlerts(){
+  const out = [];
+  if (!storageOk) out.push('<div class="alert err" role="alert"><b>このブラウザの保存データにアクセスできません。</b> 記録の書き込みを停止しています。既存の記録が表示されていればJSONで書き出せます。</div>');
+  if (recoveryRaw !== null) out.push('<div class="alert warn" role="alert">' + esc(loadNotes) + ' 現在の保存データの原本をダウンロードできます。<div class="btn-row"><button class="btn btn-small" type="button" data-alert="sourceDl">現在の原本をダウンロード</button></div></div>');
+  if (getStored(RAW_KEY) !== null) out.push('<div class="alert warn">読み込めなかった保存データを別枠に退避してあります（消していません）。<div class="btn-row"><button class="btn btn-small" type="button" data-alert="rawDl">退避データをダウンロード</button><button class="btn btn-small btn-danger" type="button" data-alert="rawDel">退避データを削除</button></div></div>');
+  const d = readDraft();
+  if (!d && getStored(DRAFT_KEY) !== null) out.push('<div class="alert warn">下書きの形式を読み取れませんでした。<div class="btn-row"><button class="btn btn-small" type="button" data-alert="draftDl">下書きの原本をダウンロード</button><button class="btn btn-small btn-danger" type="button" data-alert="draftDiscard">破棄</button></div></div>');
+  if (d && $("formSection").classList.contains("hidden")) out.push('<div class="alert warn">入力途中の記録があります：<b>' + esc(d.f.name || "製品名未入力") + '</b><div class="btn-row"><button class="btn btn-small btn-primary" type="button" data-alert="draftResume">続きを入力</button><button class="btn btn-small btn-danger" type="button" data-alert="draftDiscard">破棄</button></div></div>');
+  const b = backupInfo();
+  if (chairs.length && b.n > 0) out.push('<div class="alert">' + (b.last ? "最後のJSON書き出し以降に更新した記録が <b>" + b.n + "件</b> あります。" : "まだJSONで書き出していません。") + 'スマホの記録をPCへ移すときやバックアップに「データ管理」から書き出せます。</div>');
+  $("alerts").innerHTML = out.join("");
+  $("backupStatus").textContent = b.last ? "最後のJSON書き出し：" + fmtDate(b.last) + "（以降に更新：" + b.n + "件）" : "まだJSONを書き出していません。定期的なバックアップをおすすめします。";
+}
+function renderTray(){
+  const n = compareIds.size;
+  $("tray").classList.toggle("hidden", n === 0); document.body.classList.toggle("has-tray", n > 0);
+  $("trayText").textContent = "比較 " + n + "/4" + (n < 2 ? "（あと" + (2 - n) + "脚選んでください）" : "");
+  $("btnShowCompare").disabled = n < 2;
+}
+
+/* ---------- List actions (event delegation) ---------- */
+function bindListActions(){
+  $("chairList").addEventListener("click", async (ev) => {
+    const btn = ev.target.closest("button[data-act]");
+    if (!btn) return;
+    const card = ev.target.closest("[data-id]");
+    const ch = card && chairs.find(c => c.id === card.dataset.id);
+    if (!ch) return;
+    const act = btn.dataset.act, base = chairs;
+    if (act === "edit") startForm(ch);
+    if (act === "dup") {
+      const now = new Date().toISOString();
+      const copy = sanitizeChair({ ...ch, id: uid(), name: (ch.name + "（複製）").slice(0, 120), createdAt: now, updatedAt: now });
+      if (!(await commit([copy].concat(base), base)).ok) { failToast(); return; }
+      renderList(); renderAlerts();
+      showToast("「" + ch.name + "」を複製しました。", false, 4000, { label:"編集する", fn: () => startForm(copy) });
+    }
+    if (act === "del") {
+      const ok = await confirmDialog("記録を削除しますか？", "「" + ch.name + "」の記録を削除します。", "削除する");
+      if (!ok) return;
+      if (!(await commit(base.filter(c => c.id !== ch.id), base)).ok) { failToast(); return; }
+      compareIds.delete(ch.id); renderList(); renderAlerts();
+      showToast("「" + ch.name + "」を削除しました。", false, 8000, { label:"元に戻す", fn: async () => { if ((await commit(mergeImport(chairs, [ch]).next)).ok) { renderList(); renderAlerts(); showToast("削除を取り消しました。"); } else failToast(); } });
+    }
+  });
+  $("chairList").addEventListener("change", (ev) => {
+    const cb = ev.target.closest("input[data-act='compare']");
+    const card = cb && cb.closest("[data-id]");
+    if (!card) return;
+    if (cb.checked) {
+      if (compareIds.size >= 4) { cb.checked = false; showToast("比較は最大4製品までです。どれかを外してから追加してください。", true); return; }
+      compareIds.add(card.dataset.id);
+    } else compareIds.delete(card.dataset.id);
+    renderCompare();
+  });
+}
+
+/* ---------- Export / Import / CSV ---------- */
+function download(filename, content, type){
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function exportJson(){
+  if (!chairs.length) { showToast("書き出す記録がありません。", true); return; }
+  const payload = { app:"chair-trial-note", version:3, exportedAt:new Date().toISOString(), chairs };
+  download("chair-trial-note_" + todayStr() + ".json", JSON.stringify(payload, null, 2), "application/json");
+  prefs.lastExport = payload.exportedAt; savePrefs(); renderAlerts();
+  showToast(chairs.length + "件をJSONで書き出しました。");
+}
+function exportCsv(){
+  if (!chairs.length) { showToast("書き出す記録がありません。", true); return; }
+  const header = ["製品名","メーカー","座面タイプ","試座店舗","試座日","税込価格(円)","試座時間(分)","候補判定","総合スコア","座り心地スコア","評価済み割合(%)","評価の確度","予算判定","予算との差(円)","コスパ(点/1万円)"]
+    .concat(CRITERIA.map(c => c.label + "(1-5)"))
+    .concat(["良かった点","気になった点","自由メモ","登録日時","更新日時"])
+    .concat(FEATURES.map(f => "機能_" + f.label)).concat(FIT_ITEMS.map(f => "フィット感_" + f.label))
+    .concat(SPEC_DEFS.map(d => d.label + "(" + d.unit + ")")).concat(["機能メモ","フィット感メモ","その他・独自の機能"]);
+  const rows = sortedChairs(chairs.slice(), "total").map(({ ch, s }) => {
+    const cp = costPerf(ch, s);
+    return [ch.name, ch.maker, SEAT_LABELS[ch.seatType], ch.store, ch.date, ch.price, ch.duration, VERDICT_LABELS[ch.verdict],
+      s.total, s.comfort, Math.round(s.coverage * 100), levelLabel(s),
+      ch.price === null ? "" : (ch.price <= BUDGET ? "予算内" : "予算超過"), ch.price === null ? "" : BUDGET - ch.price, cp === null ? "" : Math.round(cp * 10) / 10]
+      .concat(CRITERIA.map(c => ch.ratings[c.key]))
+      .concat([ch.good, ch.bad, ch.memo, fmtDate(ch.createdAt), fmtDate(ch.updatedAt)])
+      .concat(FEATURES.map(f => featureText(ch, f.key))).concat(FIT_ITEMS.map(f => FIT_LABELS[ch.fit[f.key]]))
+      .concat(SPEC_DEFS.map(d => ch.specs[d.key])).concat([ch.featureMemo, ch.fitMemo, ch.customFeatures]);
+  });
+  const csv = "\uFEFF" + [header].concat(rows).map(r => r.map(csvEscape).join(",")).join("\r\n");
+  download("chair-trial-note_" + todayStr() + ".csv", csv, "text/csv;charset=utf-8");
+  showToast(chairs.length + "件をCSVで書き出しました（Excel対応）。");
+}
+let importing = false;
+async function importJsonFile(file){
+  if (importing) return;
+  const keep = "既存の記録は変更していません。";
+  if (file.size > 10 * 1024 * 1024) { showToast("ファイルは10MBまでです。" + keep, true, 6000); return; }
+  importing = true;
+  try {
+    let parsed;
+    try { parsed = JSON.parse((await file.text()).replace(/^\uFEFF/, "")); }
+    catch(e) { showToast("JSONを読み込めませんでした。ファイルと形式を確認してください。" + keep, true, 6000); return; }
+    if (!$("formSection").classList.contains("hidden") || modalResolve) {
+      showToast("開いている入力・確認画面を閉じてからJSONを読み込んでください。", true, 6000);
+      return;
+    }
+    const arr = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.chairs) ? parsed.chairs : null);
+    if (!arr) { showToast("記録の配列が見つかりません。" + keep, true, 6000); return; }
+    const issues = [], incoming = [], ids = new Set();
+    let skipped = 0;
+    if (isObj(parsed)) reportUnknown(parsed, ["app","version","exportedAt","chairs"], "JSON", message => issues.push(message));
+    for (const [i, raw] of arr.entries()) {
+      const details = [], c = sanitizeChair(raw, details);
+      if (!c) skipped++;
+      else if (ids.has(c.id)) {
+        showToast("JSON内でIDが重複しています（" + (i + 1) + "件目）。ファイルを残し、重複を確認してください。" + keep, true, 9000);
+        return;
+      } else { incoming.push(c); ids.add(c.id); }
+      issues.push(...details.map(message => (i + 1) + "件目 " + message));
+    }
+    if (!incoming.length) { showToast("有効な記録が0件です。" + keep + " " + issueSummary(issues), true, 9000); return; }
+    const base = chairs, m = mergeImport(base, incoming);
+    const lines = ["追加：" + m.added + "件", "更新：" + m.updated + "件（ファイルの方が新しい）"];
+    if (m.keptNewer) lines.push("既存を維持：" + m.keptNewer + "件（既存の方が新しい）");
+    if (m.unchanged) lines.push("変更なし：" + m.unchanged + "件");
+    if (m.conflicts) lines.push("同ID・同日時で内容が異なる記録：" + m.conflicts + "件（次の画面で選択）");
+    if (skipped) lines.push("除外：" + skipped + "件");
+    if (issues.length) lines.push("補正・除外：" + issues.length + "か所", issueSummary(issues), "読み込んだ元のJSONは保管してください。");
+    if (!m.added && !m.updated && !m.conflicts) {
+      if (issues.length) await confirmDialog("取り込みによる変更はありません", lines.join("\n"), "閉じる");
+      else showToast(lines.join("／"));
+      return;
+    }
+    if (!await confirmDialog("JSONを取り込みますか？", lines.join("\n"), "取り込む")) return;
+    let mm = m;
+    if (m.conflicts) {
+      const rep = await confirmDialog("競合している記録があります", "同じIDと更新日時で内容が異なる " + m.conflicts + "件をどう扱うか選んでください。", "読み込む内容で置き換える", { cancelLabel:"既存を維持" });
+      if (rep) mm = mergeImport(base, incoming, true);
+    }
+    if (!mm.added && !mm.updated) { showToast("既存の記録を維持しました。"); return; }
+    if (!(await commit(mm.next, base)).ok) { failToast(); return; }
+    renderList(); renderAlerts();
+    showToast("取り込みました：追加 " + mm.added + "件／更新 " + mm.updated + "件（全" + chairs.length + "件）", false, 8000, {
+      label:"元に戻す",
+      fn: async () => {
+        if (!(await commit(base, mm.next)).ok) { failToast(); return; }
+        renderList(); renderAlerts(); showToast("取り込みを取り消しました。");
+      }
+    });
+  } finally { importing = false; }
+}
+
+function sampleData(){
+  const t = todayStr();
+  const mk = (o) => sanitizeChair(o);
+  return [
+    mk({ id:"sample-mesh-a", name:"サンプル：メッシュチェアA", maker:"サンプル", store:"エディオン（サンプル）", date:t, price:79800, duration:15, verdict:"candidate", seatType:"mesh",
+      good:"腰の支えがしっかりして、背中の蒸れが少ない", bad:"肘掛けの左右調整が少し固い", memo:"サンプルデータです。不要なら削除してください。",
+      ratings:{ seat:4, back:4, lumbar:5, arm:3, head:4, recline:4, quality:4, breath:5 },
+      features:{ seat_height:"present", seat_depth:"present", lumbar_support:"present", lumbar_height:"present", headrest:"present", headrest_height:"present", footrest:"absent", recline_lock:"unknown" }, featureOptions:{ headrest:"optional" },
+      fit:{ seat_fit:"good", lumbar_fit:"mixed", headrest_fit:"good" }, specs:{ warrantyYears:3 }, featureMemo:"サンプル：ヘッドレストはオプション（店員の説明）", createdAt:new Date().toISOString(), updatedAt:new Date().toISOString() }),
+    mk({ id:"sample-cushion-b", name:"サンプル：クッションチェアB", maker:"サンプル", store:"コジマ×ビックカメラ（サンプル）", date:t, price:59800, duration:10, verdict:"hold", seatType:"cushion",
+      good:"座面が柔らかく最初の座り心地が良い", bad:"背中が蒸れる感じがした", memo:"サンプルデータです。",
+      ratings:{ seat:2, back:3, lumbar:3, arm:3, head:4, recline:3, quality:3, breath:3 },
+      features:{ seat_height:"present", seat_depth:"absent", headrest:"present", headrest_height:"absent" }, fit:{ seat_fit:"mixed" }, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString() }),
+    mk({ id:"sample-c", name:"サンプル：チェアC（未評価あり）", maker:"サンプル", store:"", date:t, price:109800, duration:5, verdict:"", seatType:"mesh",
+      good:"質感が高く、ぐらつきがない", bad:"ヘッドレストは試せなかった", memo:"サンプルデータです。ヘッドレスト等が未評価のため暫定スコアになります。",
+      ratings:{ seat:5, back:5, lumbar:4, arm:null, head:null, recline:null, quality:5, breath:4 }, createdAt:new Date().toISOString(), updatedAt:new Date().toISOString() })
+  ];
+}
+
+/* ---------- Init ---------- */
+function init(){
+  loadPrefs();
+  load();
+  buildStoreChips();
+  buildFeatureRows(); buildFitRows();
+  buildRatingRows();
+  bindListActions();
+  $("chairForm").addEventListener("submit", handleSave);
+  $("chairForm").addEventListener("input", ev => { if (ev.target.id.startsWith("f-")) markDirty(); });
+  $("btnCancelEdit").addEventListener("click", requestClose);
+  $("btnCloseTop").addEventListener("click", requestClose);
+  ["btnNew","btnFab"].forEach(id => $(id).addEventListener("click", () => startForm(null)));
+  $("btnFilters").addEventListener("click", () => { const o = $("filterBox").classList.toggle("open"); $("btnFilters").setAttribute("aria-expanded", String(o)); });
+  ["searchInput","filterVerdict","filterSeat","filterFeat","sortSelect","filterBudget"].forEach(id => { $(id).addEventListener("input", renderList); $(id).addEventListener("change", renderList); });
+  $("btnExportJson").addEventListener("click", exportJson);
+  $("btnExportCsv").addEventListener("click", exportCsv);
+  $("btnImportJson").addEventListener("click", () => $("importFile").click());
+  $("importFile").addEventListener("change", (ev) => { if (ev.target.files && ev.target.files[0]) importJsonFile(ev.target.files[0]); ev.target.value = ""; });
+  $("btnCopyAll").addEventListener("click", () => {
+    if (!chairs.length) { showToast("コピーする記録がありません。", true); return; }
+    copyText(buildSummaryText(chairs), "全" + chairs.length + "件の比較結果をコピーしました。");
+  });
+  $("btnCopyCompare").addEventListener("click", () => {
+    const sel = compareChairs();
+    if (sel.length < 2) { showToast("比較する製品を2つ以上選んでください。", true); return; }
+    copyText(buildSummaryText(sel), "比較結果をコピーしました。");
+  });
+  const clearCompare = () => { compareIds.clear(); renderList(); showToast("比較の選択を外しました。"); };
+  $("btnClearCompare").addEventListener("click", clearCompare);
+  $("btnTrayClear").addEventListener("click", clearCompare);
+  $("btnShowCompare").addEventListener("click", () => $("compareSection").scrollIntoView({ behavior:"smooth", block:"start" }));
+  $("btnSample").addEventListener("click", async () => {
+    const samples = sampleData(), base = chairs;
+    if (samples.some(s => chairs.some(c => c.id === s.id))) { showToast("サンプルはすでに追加されています。", true); return; }
+    const ok = await confirmDialog("サンプルデータを追加しますか？", "使い方の確認用に3件のサンプルを追加します。既存の記録は消えません。不要なサンプルはあとから削除できます。", "追加する");
+    if (!ok) return;
+    if (!(await commit(base.concat(samples), base)).ok) { failToast(); return; }
+    renderList(); renderAlerts(); showToast("サンプルを3件追加しました。");
+  });
+  $("btnClearAll").addEventListener("click", async () => {
+    if (!chairs.length) { showToast("削除する記録がありません。", true); return; }
+    const prev = chairs;
+    const ok = await confirmDialog("全データを削除しますか？", "記録した全" + chairs.length + "件を削除します。先にJSONで書き出しておくことをおすすめします。実行する場合は下の欄に「削除」と入力してください。", "全て削除する", { phrase:"削除" });
+    if (!ok) return;
+    if (!(await commit([], prev)).ok) { failToast(); return; }
+    compareIds.clear(); renderList(); renderAlerts();
+    showToast("全データを削除しました。", false, 10000, { label:"元に戻す", fn: async () => { if ((await commit(mergeImport(chairs, prev).next)).ok) { renderList(); renderAlerts(); showToast("全データを元に戻しました。"); } else failToast(); } });
+  });
+  $("alerts").addEventListener("click", async (ev) => {
+    const b = ev.target.closest("button[data-alert]"); if (!b) return;
+    const a = b.dataset.alert;
+    if (a === "draftResume") {
+      const d = readDraft();
+      if (!d) return;
+      const ch = d.editingId ? chairs.find(c => c.id === d.editingId) : null;
+      if (!d.editingId || (ch && draftMatches(d, ch))) startForm(ch);
+      else if (await confirmDialog("下書きを新規記録として開きますか？", "元の記録は編集開始後に更新または削除されています。下書きの内容を新規記録として開きます。", "新規記録として開く")) {
+        if (getStored(DRAFT_KEY) === d.raw) openForm(null, false, d);
+        else showToast("下書きが更新されました。再度開いてください。", true);
+      }
+    }
+    if (a === "sourceDl" && recoveryRaw !== null) download("chair-trial-note_original_" + todayStr() + ".json", recoveryRaw, "application/json");
+    if (a === "draftDl") {
+      const raw = getStored(DRAFT_KEY);
+      if (raw !== null) download("chair-trial-note_draft_" + todayStr() + ".json", raw, "application/json");
+    }
+    if (a === "draftDiscard") {
+      const raw = getStored(DRAFT_KEY);
+      if (await confirmDialog("下書きを破棄しますか？", "入力途中の内容は元に戻せません。", "破棄する")) {
+        if (!clearDraft(raw)) showToast("下書きが更新されたか、削除できませんでした。", true);
+        renderAlerts();
+      }
+    }
+    if (a === "rawDl") { try { download("chair-trial-note_unreadable_" + todayStr() + ".json", localStorage.getItem(RAW_KEY) || "", "application/json"); } catch(e){} }
+    if (a === "rawDel") {
+      const raw = getStored(RAW_KEY);
+      if (await confirmDialog("退避データを削除しますか？", "読み込めなかった元データを完全に削除します。必要ならダウンロードしてから実行してください。", "削除する")) {
+        try { if (localStorage.getItem(RAW_KEY) === raw) localStorage.removeItem(RAW_KEY); } catch(e) { showToast("退避データを削除できませんでした。", true); }
+        renderAlerts();
+      }
+    }
+  });
+  $("modalOk").addEventListener("click", () => closeModal(true));
+  $("modalCancel").addEventListener("click", () => closeModal(false));
+  $("modalBack").addEventListener("click", (ev) => { if (ev.target === $("modalBack")) closeModal(false); });
+  const trapTab = (ev, root) => {
+    const f = [...root.querySelectorAll("button:not([disabled]),input:not([disabled]),select,textarea,summary")].filter(e => e.getClientRects().length);
+    if (!f.length) return;
+    if (!f.includes(document.activeElement)) { ev.preventDefault(); f[ev.shiftKey ? f.length - 1 : 0].focus(); }
+    else if (ev.shiftKey && document.activeElement === f[0]) { ev.preventDefault(); f[f.length - 1].focus(); }
+    else if (!ev.shiftKey && document.activeElement === f[f.length - 1]) { ev.preventDefault(); f[0].focus(); }
+  };
+  document.addEventListener("keydown", (ev) => {
+    const modalOpen = $("modalBack").classList.contains("show"), sheetOpen = !$("formSection").classList.contains("hidden");
+    if (ev.key === "Escape" && !ev.isComposing) { if (modalOpen) closeModal(false); else if (sheetOpen) requestClose(); }
+    if (ev.key === "Tab" && sheetOpen && $("btnSave").disabled && !modalOpen) ev.preventDefault();
+    else if (ev.key === "Tab" && (modalOpen || sheetOpen)) trapTab(ev, modalOpen ? $("modalBack") : $("formSection"));
+  });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) flushDraft(); });
+  window.addEventListener("pagehide", flushDraft);
+  window.addEventListener("beforeunload", (ev) => { if (!flushDraft()) { ev.preventDefault(); ev.returnValue = ""; } });
+  window.addEventListener("storage", (ev) => {
+    if (ev.key === DRAFT_KEY || ev.key === RAW_KEY) { renderAlerts(); return; }
+    if ((ev.key !== STORAGE_KEY && ev.key !== null) || getStored(STORAGE_KEY) === storedRaw) return;
+    load(); renderList(); renderAlerts();
+    showToast("別のタブで記録が更新されたため、最新の内容を読み込みました。", false, 4000);
+  });
+  $("featModeKey").addEventListener("click", () => { prefs.featAll = false; savePrefs(); refreshFeatureUI(); });
+  $("featModeAll").addEventListener("click", () => { prefs.featAll = true; savePrefs(); refreshFeatureUI(); });
+  $("featOnlyUnknown").addEventListener("change", () => { activeUnknownFeature = null; refreshFeatureUI(); });
+  $("btnCopyAllDetail").addEventListener("click", () => {
+    if (!chairs.length) { showToast("コピーする記録がありません。", true); return; }
+    copyText(buildSummaryText(chairs, true, $("omitAllUnknown").checked), "全" + chairs.length + "件を詳細コピーしました。");
+  });
+  $("btnCopyCompareDetail").addEventListener("click", () => {
+    const sel = compareChairs();
+    if (sel.length < 2) { showToast("比較する製品を2つ以上選んでください。", true); return; }
+    copyText(buildSummaryText(sel, true, $("omitCompareUnknown").checked), "比較結果（詳細）をコピーしました。");
+  });
+  $("compareTable").addEventListener("click", (ev) => { const b = ev.target.closest("button[data-sec]"); if (b) { const id = b.dataset.sec; cmpOpen[id] = !cmpOpen[id]; renderCompare(); $("compareTable").querySelector('[data-sec="' + id + '"]').focus({ preventScroll:true }); } });
+  renderAlerts();
+  renderList();
+}
+document.addEventListener("DOMContentLoaded", init);
+</script>
+</body>
+</html>
